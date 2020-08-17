@@ -1,22 +1,24 @@
 import React from "react";
 import { render } from "react-dom";
-import { Stage, Layer, Text, Circle, Line } from "react-konva";
+import { Stage, Layer, Circle, Line, TextPath } from "react-konva";
 
 import Answer from "./components/Answer";
 
-const ANSWERS = [
-  { id: "yes", text: "Yes" },
-  { id: "no", text: "No" },
-  { id: "maybe", text: "Maybe" },
-];
+import "./index.css";
 
-function haveIntersection(r1, r2) {
-  return !(
-    r2.x > r1.x + r1.width ||
-    r2.x + r2.width < r1.x ||
-    r2.y > r1.y + r1.height ||
-    r2.y + r2.height < r1.y
-  );
+function generateSVGPathCommandsForCircle({ radius }) {
+  const start = `M${-radius},0`;
+  const arc1 = `a${radius},${radius} 0 1,1 ${radius * 2},0`;
+  const arc2 = `a${radius},${radius} 0 1,1 ${-radius * 2},0`;
+  return `${start}${arc1}${arc2}`;
+}
+
+function generateCircle() {
+  return {
+    radius: window.innerHeight / 2,
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+  };
 }
 
 function generateShapes() {
@@ -29,42 +31,57 @@ function generateShapes() {
   }));
 }
 
-const INITIAL_STATE = { circles: generateShapes() };
+const ANSWERS = [
+  { id: "yes", text: "Yes" },
+  { id: "no", text: "No" },
+  { id: "maybe", text: "Maybe" },
+];
+
+const CIRCLES = generateShapes();
+
+function haveIntersection(r1, r2) {
+  return !(
+    r2.x > r1.x + r1.width ||
+    r2.x + r2.width < r1.x ||
+    r2.y > r1.y + r1.height ||
+    r2.y + r2.height < r1.y
+  );
+}
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      circles: INITIAL_STATE.circles,
+      circles: CIRCLES,
+      bigCircle: generateCircle(),
       traceLines: {},
       cursorType: "default",
-      isTouching: "yes",
-      isLanded: "no",
+      answerTriggered: null,
+      answerActivated: null,
     };
   }
 
   answerRefs = {};
 
   handleDragHover = (e) => {
-    console.log(this.answerRefs);
-    Object.keys(this.answerRefs).forEach((id) => {
+    let hoveredAnswerId = null;
+    for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
-        this.setState({ isTouching: id });
-      } else {
-        this.setState({ isTouching: null });
+        hoveredAnswerId = id;
+        break;
       }
-    });
+    }
+    this.setState({ answerTriggered: hoveredAnswerId });
   };
 
   handleDropLanding = (e) => {
-    console.log(this.answerRefs);
-    Object.keys(this.answerRefs).forEach((id) => {
+    for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
-        this.setState({ isLanded: id });
+        this.setState({ answerActivated: id });
       }
-    });
+    }
   };
 
   updateDragLine = (id, point) => {
@@ -130,18 +147,37 @@ class App extends React.Component {
         style={{ cursor: this.state.cursorType }}
       >
         <Layer>
+          <Circle
+            x={this.state.bigCircle.x}
+            y={this.state.bigCircle.y}
+            stroke="black"
+            fill="#fff"
+            radius={this.state.bigCircle.radius}
+          />
+
+          <TextPath
+            text="Hello world Hello Hello world Hello Hello world Hello Hello world"
+            fill="#333"
+            fontSize={20}
+            rotation={180}
+            data={generateSVGPathCommandsForCircle({
+              radius: this.state.bigCircle.radius - 20,
+            })}
+            x={this.state.bigCircle.x}
+            y={this.state.bigCircle.y}
+          />
+
           {ANSWERS.map(({ id, text }, i) => (
             <Answer
-              id={id}
+              key={id}
               ref={(ref) => {
-                console.log("set ref");
                 this.answerRefs[id] = ref;
               }}
               text={text}
               x={(window.innerWidth / 4) * (i + 1)}
               y={20}
-              isTriggered={this.state.isTouching === id}
-              isActivated={this.state.isLanded === id}
+              isTriggered={this.state.answerTriggered === id}
+              isActivated={this.state.answerActivated === id}
             />
           ))}
 
