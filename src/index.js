@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "react-dom";
-import { Stage, Layer, Circle, Line, TextPath } from "react-konva";
+import { Stage, Layer, Circle, Line, Group } from "react-konva";
 
 import Answer from "./components/Answer";
 import AnnualRings from "./components/AnnualRings";
@@ -141,23 +141,29 @@ class App extends React.Component {
         style={{ cursor: this.state.cursorType }}
       >
         <Layer>
-          <Circle
-            x={this.state.bigCircle.x}
-            y={this.state.bigCircle.y}
-            stroke="black"
-            fill="#fff"
-            radius={this.state.bigCircle.radius}
-          />
+          <Group x={500} y={500}>
+            <Circle
+              x={0}
+              y={0}
+              stroke="black"
+              fill="#fff"
+              radius={this.state.bigCircle.radius}
+            />
 
-          <AnnualRings
-            textLines={[
-              "This is the first sentence This is the first sentence This is the first sentence This is the first sentence This is the first sentence",
-            ]}
-            x={this.state.bigCircle.x}
-            y={this.state.bigCircle.y}
-            outerRadius={this.state.bigCircle.radius}
-            ringWidth={20}
-          />
+            <AnnualRings
+              textLines={[
+                "This is the first sentence This is the first sentence",
+                "This is the first sentence This is the first sentence",
+                "This is the first sentence This is the first sentence",
+                "This is the first sentence This is the first sentence",
+                "This is the first sentence This is the first sentence",
+              ]}
+              x={0}
+              y={0}
+              outerRadius={this.state.bigCircle.radius}
+              ringWidth={20}
+            />
+          </Group>
 
           {ANSWERS.map(({ id, text }, i) => (
             <Answer

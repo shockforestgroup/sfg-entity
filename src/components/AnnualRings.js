@@ -5,26 +5,26 @@ function generateSVGPathCommandsForCircle({ radius }) {
   const f = 0.552;
   const curveSegment1 = [
     `M0 0`,
-    `C${f * 100} 0`,
-    `100 ${100 - f * 100}`,
-    `100 100`,
+    `C${f * radius} 0`,
+    `${radius} ${radius - f * radius}`,
+    `${radius} ${radius}`,
   ].join(" ");
   const curveSegment2 = [
-    `M100 100`,
-    `C100 ${100 + f * 100}`,
-    `${f * 100} 200`,
-    `0 200`,
+    `M${radius} ${radius}`,
+    `C${radius} ${radius + f * radius}`,
+    `${f * radius} ${radius * 2}`,
+    `0 ${radius * 2}`,
   ].join(" ");
   const curveSegment3 = [
-    `M0 200`,
-    `C-${f * 100} 200`,
-    `-100 ${100 + f * 100}`,
-    `-100 100`,
+    `M0 ${radius * 2}`,
+    `C-${f * radius} ${radius * 2}`,
+    `${-radius} ${radius + f * radius}`,
+    `${-radius} ${radius}`,
   ].join(" ");
   const curveSegment4 = [
-    `M-100 100`,
-    `C-100 ${100 - f * 100}`,
-    `-${f * 100} 0`,
+    `M${-radius} ${radius}`,
+    `C${-radius} ${radius - f * radius}`,
+    `-${f * radius} 0`,
     `0 0`,
   ].join(" ");
   return `${curveSegment1}${curveSegment2}${curveSegment3}${curveSegment4}`;
@@ -41,10 +41,10 @@ const index = ({ textLines = [], x, y, outerRadius, ringWidth = 50 }) => (
         fontFamily="Arial"
         rotation={0}
         data={generateSVGPathCommandsForCircle({
-          radius: outerRadius - i * ringWidth,
+          radius: outerRadius - i * ringWidth * 4,
         })}
-        x={x}
-        y={y}
+        x={0}
+        y={0}
       />
     ))}
   </>
