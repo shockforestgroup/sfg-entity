@@ -3,15 +3,9 @@ import { render } from "react-dom";
 import { Stage, Layer, Circle, Line, TextPath } from "react-konva";
 
 import Answer from "./components/Answer";
+import AnnualRings from "./components/AnnualRings";
 
 import "./index.css";
-
-function generateSVGPathCommandsForCircle({ radius }) {
-  const start = `M${-radius},0`;
-  const arc1 = `a${radius},${radius} 0 1,1 ${radius * 2},0`;
-  const arc2 = `a${radius},${radius} 0 1,1 ${-radius * 2},0`;
-  return `${start}${arc1}${arc2}`;
-}
 
 function generateCircle() {
   return {
@@ -155,16 +149,14 @@ class App extends React.Component {
             radius={this.state.bigCircle.radius}
           />
 
-          <TextPath
-            text="Hello world Hello Hello world Hello Hello world Hello Hello world"
-            fill="#333"
-            fontSize={20}
-            rotation={180}
-            data={generateSVGPathCommandsForCircle({
-              radius: this.state.bigCircle.radius - 20,
-            })}
+          <AnnualRings
+            textLines={[
+              "This is the first sentence This is the first sentence This is the first sentence This is the first sentence This is the first sentence",
+            ]}
             x={this.state.bigCircle.x}
             y={this.state.bigCircle.y}
+            outerRadius={this.state.bigCircle.radius}
+            ringWidth={20}
           />
 
           {ANSWERS.map(({ id, text }, i) => (
