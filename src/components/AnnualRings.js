@@ -1,47 +1,59 @@
 import React from "react";
 import { TextPath } from "react-konva";
 
-function generateSVGPathCommandsForCircle({ radius }) {
+function generateSVGPathCommandsForCircle({ radius, x, y }) {
   const f = 0.552;
   const curveSegment1 = [
-    `M0 0`,
-    `C${f * radius} 0`,
-    `${radius} ${radius - f * radius}`,
-    `${radius} ${radius}`,
+    `M0 ${-radius}`,
+    `C${f * radius} ${-radius}`,
+    `${radius} ${-f * radius}`,
+    `${radius} 0`,
   ].join(" ");
   const curveSegment2 = [
-    `M${radius} ${radius}`,
-    `C${radius} ${radius + f * radius}`,
-    `${f * radius} ${radius * 2}`,
-    `0 ${radius * 2}`,
+    `M${radius} 0`,
+    `C${radius} ${f * radius}`,
+    `${f * radius} ${radius}`,
+    `0 ${radius}`,
   ].join(" ");
   const curveSegment3 = [
-    `M0 ${radius * 2}`,
-    `C-${f * radius} ${radius * 2}`,
-    `${-radius} ${radius + f * radius}`,
-    `${-radius} ${radius}`,
+    `M0 ${radius}`,
+    `C-${f * radius} ${radius}`,
+    `${-radius} ${f * radius}`,
+    `${-radius} 0`,
   ].join(" ");
   const curveSegment4 = [
-    `M${-radius} ${radius}`,
-    `C${-radius} ${radius - f * radius}`,
-    `-${f * radius} 0`,
-    `0 0`,
+    `M${-radius} 0`,
+    `C${-radius} ${-f * radius}`,
+    `-${f * radius} ${-radius}`,
+    `0 ${-radius}`,
   ].join(" ");
   return `${curveSegment1}${curveSegment2}${curveSegment3}${curveSegment4}`;
 }
 
-const index = ({ textLines = [], x, y, outerRadius, ringWidth = 50 }) => (
+const OUTER_PADDING = 15;
+
+const index = ({
+  textLines = [],
+  x,
+  y,
+  outerRadius,
+  ringWidth = 50,
+  rotationFn = () => 0,
+}) => (
   <>
     {textLines.map((text, i) => (
       <TextPath
         key={text + i}
         text={text}
         fill="#333"
-        fontSize={20}
+        fontSize={16}
         fontFamily="Arial"
-        rotation={0}
+        textBaseline="top"
+        rotation={rotationFn(i)}
         data={generateSVGPathCommandsForCircle({
-          radius: outerRadius - i * ringWidth * 4,
+          radius: outerRadius - i * ringWidth * 4 - OUTER_PADDING,
+          x,
+          y,
         })}
         x={0}
         y={0}
