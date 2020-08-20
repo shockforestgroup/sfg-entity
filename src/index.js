@@ -96,8 +96,8 @@ class App extends React.Component {
     /* append to existing trace line points for this element */
     const elementTraceLinePoints = [
       ...(this.state.traceLines[id] || []),
-      point.x,
-      point.y,
+      point.x - this.state.bigCircle.x,
+      point.y - this.state.bigCircle.y,
     ];
     this.setState({
       traceLines: { ...this.state.traceLines, [id]: elementTraceLinePoints },
@@ -201,16 +201,17 @@ class App extends React.Component {
                 onMouseLeave={() => this.setState({ cursorType: "default" })}
               />
             ))}
+
+            {Object.keys(this.state.traceLines).map((key) => (
+              <Line
+                key={key}
+                id={key}
+                points={this.state.traceLines[key]}
+                stroke="blue"
+                strokeWidth={2}
+              />
+            ))}
           </Group>
-          {Object.keys(this.state.traceLines).map((key) => (
-            <Line
-              key={key}
-              id={key}
-              points={this.state.traceLines[key]}
-              stroke="blue"
-              strokeWidth={2}
-            />
-          ))}
         </Layer>
       </Stage>
     );
