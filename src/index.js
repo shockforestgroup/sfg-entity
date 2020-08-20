@@ -3,7 +3,8 @@ import { render } from "react-dom";
 import { Stage, Layer, Circle, Line, Group } from "react-konva";
 
 import AnnualRings from "./components/AnnualRings";
-import AnswerRing from "./components/AnswerRing";
+
+import EntityAnswers from "./components/EntityAnswers";
 import EntityOrganism from "./components/EntityOrganism";
 
 import "./index.css";
@@ -157,7 +158,7 @@ class App extends React.Component {
         style={{ cursor: this.state.cursorType }}
       >
         <Layer>
-          <Group x={1000} y={400}>
+          <Group x={1000} y={400} draggable>
             <Circle
               x={0}
               y={0}
@@ -179,19 +180,15 @@ class App extends React.Component {
               rotationFn={(i) => 0}
             />
 
-            {ANSWERS.map(({ id, text }, i) => (
-              <AnswerRing
-                key={id}
-                ref={(ref) => {
-                  this.answerRefs[id] = ref;
-                }}
-                radius={this.state.bigCircle.radius}
-                rotationOffset={-90 - (i * 180) / ANSWERS.length}
-                textLines={[text]}
-                isTriggered={this.state.answerTriggered === id}
-                isActivated={this.state.answerActivated === id}
-              />
-            ))}
+            <EntityAnswers
+              options={ANSWERS}
+              radius={this.state.bigCircle.radius}
+              currentActivated={this.state.answerActivated}
+              currentTriggered={this.state.answerTriggered}
+              createRef={(answerId, ref) => {
+                this.answerRefs[answerId] = ref;
+              }}
+            />
 
             {this.state.shapes.map((o, i) => (
               <>
