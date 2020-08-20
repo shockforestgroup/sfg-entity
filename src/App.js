@@ -83,23 +83,39 @@ class App extends React.Component {
   };
 
   handleDropLanding = (e) => {
+    const organismId = e.target.id();
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
-        this.setState({ answerActivated: id });
+        this.setState({
+          answerActivated: id,
+          traceLines: {
+            ...this.state.traceLines,
+            [organismId]: {
+              ...this.state.traceLines[organismId],
+              confirmed: true,
+            },
+          },
+        });
       }
     }
   };
 
   updateDragLine = (id, point) => {
+    const existingElementTraceLinePoints = this.state.traceLines[id]
+      ? this.state.traceLines[id].points
+      : [];
     /* append to existing trace line points for this element */
     const elementTraceLinePoints = [
-      ...(this.state.traceLines[id] || []),
+      ...existingElementTraceLinePoints,
       point.x - this.state.bigCircle.x,
       point.y - this.state.bigCircle.y,
     ];
     this.setState({
-      traceLines: { ...this.state.traceLines, [id]: elementTraceLinePoints },
+      traceLines: {
+        ...this.state.traceLines,
+        [id]: { ...this.state.traceLines[id], points: elementTraceLinePoints },
+      },
     });
   };
 
@@ -205,8 +221,8 @@ class App extends React.Component {
               <Line
                 key={key}
                 id={key}
-                points={this.state.traceLines[key]}
-                stroke="blue"
+                points={this.state.traceLines[key].points}
+                stroke={this.state.traceLines[key].confirmed && "blue"}
                 strokeWidth={2}
               />
             ))}
