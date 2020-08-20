@@ -1,10 +1,10 @@
 import React from "react";
 import { render } from "react-dom";
-import { Stage, Layer, Circle, Line, Group, Path } from "react-konva";
+import { Stage, Layer, Circle, Line, Group } from "react-konva";
 
-import Answer from "./components/Answer";
 import AnnualRings from "./components/AnnualRings";
 import AnswerRing from "./components/AnswerRing";
+import EntityOrganism from "./components/EntityOrganism";
 
 import "./index.css";
 
@@ -33,12 +33,11 @@ function generateShapes() {
 }
 
 const ANSWERS = [
-  { id: "yes", text: "Yes" },
-  { id: "no", text: "No" },
-  { id: "maybe", text: "Maybe" },
+  { id: "1", text: "when I was 1" },
+  { id: "2", text: "when I was 2" },
+  { id: "3", text: "when I was 3" },
+  { id: "4", text: "when I was 5" },
 ];
-
-const CIRCLES = generateShapes();
 
 function haveIntersection(r1, r2) {
   return !(
@@ -53,7 +52,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      circles: CIRCLES,
+      shapes: generateShapes(),
       bigCircle: generateCircle(),
       traceLines: {},
       cursorType: "default",
@@ -108,7 +107,7 @@ class App extends React.Component {
   handleDragStart = (e) => {
     const id = e.target.id();
     this.setState({
-      circles: this.state.circles.map((circle) => {
+      shapes: this.state.shapes.map((circle) => {
         return {
           ...circle,
           isDragging: circle.id === id,
@@ -135,7 +134,7 @@ class App extends React.Component {
   handleDragEnd = (e) => {
     this.handleDropLanding(e);
     this.setState({
-      circles: this.state.circles.map((circle) => {
+      shapes: this.state.shapes.map((circle) => {
         return {
           ...circle,
           isDragging: false,
@@ -158,70 +157,59 @@ class App extends React.Component {
         style={{ cursor: this.state.cursorType }}
       >
         <Layer>
-          <Group x={1000} y={500}>
+          <Group x={1000} y={400}>
             <Circle
               x={0}
               y={0}
+              radius={this.state.bigCircle.radius}
               stroke="black"
               fill="#fff"
-              radius={this.state.bigCircle.radius}
             />
 
             <AnnualRings
               textLines={[
-                "This is the first sentence This is the first sentence",
-                "This is the first sentence This is the first sentence",
-                "This is the first sentence This is the first sentence",
-                "This is the first sentence This is the first sentence",
-                "This is the first sentence This is the first sentence",
+                "I'm here, like you, though I am dead and you are alive. ",
+                "We both share an ability to remember.",
+                "From when is your earliest memory?",
               ]}
               x={0}
               y={0}
               outerRadius={this.state.bigCircle.radius}
               ringWidth={6}
-              rotationFn={(i) => -45 + i * 10}
+              rotationFn={(i) => 0}
             />
 
-            <AnswerRing text="yesThis is the first sentence This is the first sentence" />
-
             {ANSWERS.map(({ id, text }, i) => (
-              <Answer
+              <AnswerRing
                 key={id}
                 ref={(ref) => {
                   this.answerRefs[id] = ref;
                 }}
-                text={text}
-                x={100 * (i + 1)}
-                y={20}
+                radius={this.state.bigCircle.radius}
+                rotationOffset={-90 - (i * 180) / ANSWERS.length}
+                textLines={[text]}
                 isTriggered={this.state.answerTriggered === id}
                 isActivated={this.state.answerActivated === id}
               />
             ))}
 
-            {this.state.circles.map((circle, i) => (
-              <Path
-                id={circle.id}
-                key={circle.id}
-                data={CELL_SHAPES[i % CELL_SHAPES.length]}
-                x={circle.x}
-                y={circle.y}
-                rotation={circle.rotation}
-                scaleX={circle.isDragging ? 1.05 : 1}
-                scaleY={circle.isDragging ? 1.05 : 1}
-                stroke="black"
-                strokeWidth={1}
-                fill="#fff"
-                draggable
-                onDragStart={this.handleDragStart}
-                onDragMove={this.handleDragMove}
-                onDragEnd={this.handleDragEnd}
-                onMouseEnter={() => {
-                  this.setState({ cursorType: "grab" });
-                }}
-                onMouseLeave={() => {
-                  this.setState({ cursorType: "default" });
-                }}
-              />
+            {this.state.shapes.map((o, i) => (
+              <>
+                <EntityOrganism
+                  key={o.id}
+                  id={o.id}
+                  x={o.x}
+                  y={o.y}
+                  rotation={o.rotation}
+                  shapeData={CELL_SHAPES[i % CELL_SHAPES.length]}
+                  isDragging={o.isDragging}
+                  onDragStart={this.handleDragStart}
+                  onDragMove={this.handleDragMove}
+                  onDragEnd={this.handleDragEnd}
+                  onMouseEnter={() => this.setState({ cursorType: "grab" })}
+                  onMouseLeave={() => this.setState({ cursorType: "default" })}
+                />
+              </>
             ))}
           </Group>
           {Object.keys(this.state.traceLines).map((key) => (
