@@ -28,7 +28,7 @@ const index = React.forwardRef(
             fill={textColor}
             fontSize={16}
             fontFamily="Arial"
-            textBaseline="top"
+            textBaseline={inverted ? "bottom" : "top"}
             rotation={rotationFn(i)}
             data={generateSVGPathCommandsForCircle({
               radius: outerRadius - i * ringWidth * 4 - OUTER_PADDING,

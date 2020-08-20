@@ -2,32 +2,30 @@ import React from "react";
 import { render } from "react-dom";
 import { Stage, Layer, Circle, Line, Group } from "react-konva";
 
-import AnnualRings from "./components/AnnualRings";
-
+import EntityQuestion from "./components/EntityQuestion";
 import EntityAnswers from "./components/EntityAnswers";
 import EntityOrganism from "./components/EntityOrganism";
 
 import "./index.css";
 
-const CELL_SHAPES = [
-  "M18 19.5C18 30.2696 12.8513 39 6.50001 39C0.148731 39 0.5 30.2696 0.5 19.5C0.5 8.73045 0.148731 0 6.50001 0C12.8513 0 18 8.73045 18 19.5Z",
-  "M20 26.5C20 37.2696 16.2345 39 7.88873 39C-0.456997 39 0.00457863 30.2696 0.00457863 19.5C0.00457863 8.73045 -0.456997 0 7.88873 0C16.2345 0 20 15.7304 20 26.5Z",
-  "M16.9991 23.9212C16.9991 31.6801 11.4215 36 6.85798 36C-2.02875 36 0.266203 25.7589 0.266203 18C0.266203 10.2411 -0.507573 0 8.37915 0C17.2659 0 16.9991 16.1623 16.9991 23.9212Z",
-];
+function getRandomInRange(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 function generateCircle() {
   return {
-    radius: window.innerHeight / 2,
+    radius: window.innerHeight / 2 - 20,
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
   };
 }
 
-function generateShapes() {
+function generateShapes(circle) {
+  const DISTANCE = circle.radius / 6;
   return [...Array(10)].map((_, i) => ({
     id: i.toString(),
-    x: (Math.random() * 200) / 7 + (3 * 200) / 7,
-    y: (Math.random() * 200) / 7 + (3 * 200) / 7,
+    x: getRandomInRange(-DISTANCE, DISTANCE),
+    y: getRandomInRange(-DISTANCE, DISTANCE),
     rotation: Math.random() * 180,
     isDragging: true,
   }));
@@ -52,9 +50,10 @@ function haveIntersection(r1, r2) {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    const circle = generateCircle();
     this.state = {
-      shapes: generateShapes(),
-      bigCircle: generateCircle(),
+      bigCircle: circle,
+      shapes: generateShapes(circle),
       traceLines: {},
       cursorType: "default",
       answerTriggered: null,
@@ -124,6 +123,7 @@ class App extends React.Component {
   };
 
   handleDragMove = (e) => {
+    /* TODO: Update position of organism in state too, to keep in sync! */
     const center = this.calculateCellCenter(e);
     this.handleDragHover(e);
     this.updateDragLine(e.target.id(), {
@@ -158,7 +158,11 @@ class App extends React.Component {
         style={{ cursor: this.state.cursorType }}
       >
         <Layer>
-          <Group x={1000} y={400} draggable>
+          <Group
+            x={this.state.bigCircle.x}
+            y={this.state.bigCircle.y}
+            draggable
+          >
             <Circle
               x={0}
               y={0}
@@ -167,17 +171,9 @@ class App extends React.Component {
               fill="#fff"
             />
 
-            <AnnualRings
-              textLines={[
-                "I'm here, like you, though I am dead and you are alive. ",
-                "We both share an ability to remember.",
-                "From when is your earliest memory?",
-              ]}
-              x={0}
-              y={0}
-              outerRadius={this.state.bigCircle.radius}
-              ringWidth={6}
-              rotationFn={(i) => 0}
+            <EntityQuestion
+              radius={this.state.bigCircle.radius}
+              text="I'm here, like you, though I am dead and you are alive \n We both share an ability to remember. \n From when is your earliest memory?"
             />
 
             <EntityAnswers
@@ -190,23 +186,20 @@ class App extends React.Component {
               }}
             />
 
-            {this.state.shapes.map((o, i) => (
-              <>
-                <EntityOrganism
-                  key={o.id}
-                  id={o.id}
-                  x={o.x}
-                  y={o.y}
-                  rotation={o.rotation}
-                  shapeData={CELL_SHAPES[i % CELL_SHAPES.length]}
-                  isDragging={o.isDragging}
-                  onDragStart={this.handleDragStart}
-                  onDragMove={this.handleDragMove}
-                  onDragEnd={this.handleDragEnd}
-                  onMouseEnter={() => this.setState({ cursorType: "grab" })}
-                  onMouseLeave={() => this.setState({ cursorType: "default" })}
-                />
-              </>
+            {this.state.shapes.map((o) => (
+              <EntityOrganism
+                key={o.id}
+                id={o.id}
+                x={o.x}
+                y={o.y}
+                rotation={o.rotation}
+                isDragging={o.isDragging}
+                onDragStart={this.handleDragStart}
+                onDragMove={this.handleDragMove}
+                onDragEnd={this.handleDragEnd}
+                onMouseEnter={() => this.setState({ cursorType: "grab" })}
+                onMouseLeave={() => this.setState({ cursorType: "default" })}
+              />
             ))}
           </Group>
           {Object.keys(this.state.traceLines).map((key) => (
