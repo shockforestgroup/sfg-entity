@@ -173,11 +173,7 @@ class App extends React.Component {
         style={{ cursor: this.state.cursorType }}
       >
         <Layer>
-          <Group
-            x={this.state.bigCircle.x}
-            y={this.state.bigCircle.y}
-            draggable
-          >
+          <Group x={this.state.bigCircle.x} y={this.state.bigCircle.y}>
             <Circle
               x={0}
               y={0}
@@ -222,8 +218,12 @@ class App extends React.Component {
                 key={key}
                 id={key}
                 points={this.state.traceLines[key].points}
-                stroke={this.state.traceLines[key].confirmed && "blue"}
-                strokeWidth={2}
+                stroke={this.state.traceLines[key].confirmed && "#aaa"}
+                strokeWidth={1}
+                shadowColor="#333"
+                shadowOffsetX={1}
+                shadowBlur={50}
+                opacity={1}
               />
             ))}
           </Group>
