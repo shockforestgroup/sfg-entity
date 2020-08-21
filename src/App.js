@@ -1,15 +1,13 @@
 import React from "react";
 import { Stage, Layer, Circle, Line, Group } from "react-konva";
 
+import getRandomInRange from "./helpers/getRandomInRange";
+import haveIntersection from "./helpers/haveIntersection";
 import EntityQuestion from "./components/EntityQuestion";
 import EntityAnswers from "./components/EntityAnswers";
 import EntityOrganism from "./components/EntityOrganism";
 
 import "./App.css";
-
-function getRandomInRange(min, max) {
-  return Math.random() * (max - min) + min;
-}
 
 function generateCircle() {
   return {
@@ -19,14 +17,15 @@ function generateCircle() {
   };
 }
 
-function generateShapes(circle) {
+function generateOrganisms(circle) {
   const DISTANCE = circle.radius / 6;
   return [...Array(10)].map((_, i) => ({
     id: i.toString(),
     x: getRandomInRange(-DISTANCE, DISTANCE),
     y: getRandomInRange(-DISTANCE, DISTANCE),
     rotation: Math.random() * 180,
-    isDragging: true,
+    isDragging: false,
+    isDropReady: false,
   }));
 }
 
@@ -37,22 +36,13 @@ const ANSWERS = [
   { id: "4", text: "when I was 5" },
 ];
 
-function haveIntersection(r1, r2) {
-  return !(
-    r2.x > r1.x + r1.width ||
-    r2.x + r2.width < r1.x ||
-    r2.y > r1.y + r1.height ||
-    r2.y + r2.height < r1.y
-  );
-}
-
 class App extends React.Component {
   constructor(props) {
     super(props);
     const circle = generateCircle();
     this.state = {
       bigCircle: circle,
-      shapes: generateShapes(circle),
+      organisms: generateOrganisms(circle),
       traceLines: {},
       cursorType: "default",
       answerTriggered: null,
@@ -71,11 +61,20 @@ class App extends React.Component {
   };
 
   handleDragHover = (e) => {
+    const organismId = e.target.id();
     let hoveredAnswerId = null;
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
         hoveredAnswerId = id;
+        this.setState({
+          organisms: this.state.organisms.map((circle) => {
+            return {
+              ...circle,
+              isDropReady: circle.id === organismId,
+            };
+          }),
+        });
         break;
       }
     }
@@ -101,7 +100,10 @@ class App extends React.Component {
     }
   };
 
-  updateDragLine = (id, point) => {
+  updateDragLine = (e) => {
+    const id = e.target.id();
+    const center = this.calculateCellCenter(e);
+    const point = { x: center.x, y: center.y };
     const existingElementTraceLinePoints = this.state.traceLines[id]
       ? this.state.traceLines[id].points
       : [];
@@ -121,48 +123,36 @@ class App extends React.Component {
 
   handleDragStart = (e) => {
     const id = e.target.id();
+    this.updateDragLine(e);
     this.setState({
-      shapes: this.state.shapes.map((circle) => {
+      cursorType: "grabbing",
+      organisms: this.state.organisms.map((circle) => {
         return {
           ...circle,
           isDragging: circle.id === id,
         };
       }),
     });
-    const center = this.calculateCellCenter(e);
-    this.updateDragLine(e.target.id(), {
-      x: center.x,
-      y: center.y,
-    });
-    this.setState({ cursorType: "grabbing" });
   };
 
   handleDragMove = (e) => {
     /* TODO: Update position of organism in state too, to keep in sync! */
-    const center = this.calculateCellCenter(e);
     this.handleDragHover(e);
-    this.updateDragLine(e.target.id(), {
-      x: center.x,
-      y: center.y,
-    });
+    this.updateDragLine(e);
   };
 
   handleDragEnd = (e) => {
     this.handleDropLanding(e);
+    this.updateDragLine(e);
     this.setState({
-      shapes: this.state.shapes.map((circle) => {
+      cursorType: "grab",
+      organisms: this.state.organisms.map((circle) => {
         return {
           ...circle,
           isDragging: false,
         };
       }),
     });
-    const center = this.calculateCellCenter(e);
-    this.updateDragLine(e.target.id(), {
-      x: center.x,
-      y: center.y,
-    });
-    this.setState({ cursorType: "grab" });
   };
 
   render() {
@@ -197,13 +187,13 @@ class App extends React.Component {
               }}
             />
 
-            {this.state.shapes.map((o) => (
+            {this.state.organisms.map((o) => (
               <EntityOrganism
                 key={o.id}
                 id={o.id}
                 x={o.x}
                 y={o.y}
-                rotation={o.rotation}
+                rotation={o.isDropReady ? 45 : o.rotation}
                 isDragging={o.isDragging}
                 onDragStart={this.handleDragStart}
                 onDragMove={this.handleDragMove}
