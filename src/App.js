@@ -24,8 +24,6 @@ function generateOrganisms(circle) {
     x: getRandomInRange(-DISTANCE, DISTANCE),
     y: getRandomInRange(-DISTANCE, DISTANCE),
     rotation: Math.random() * 180,
-    isDragging: false,
-    isDropReady: false,
   }));
 }
 
@@ -45,8 +43,11 @@ class App extends React.Component {
       organisms: generateOrganisms(circle),
       traceLines: {},
       cursorType: "default",
-      answerTriggered: null,
-      answerActivated: null,
+      replyState: {
+        answerId: null,
+        organismId: null,
+        confirmed: false,
+      },
     };
   }
 
@@ -60,45 +61,11 @@ class App extends React.Component {
     };
   };
 
-  handleDragHover = (e) => {
-    const organismId = e.target.id();
-    let hoveredAnswerId = null;
-    for (let id in this.answerRefs) {
-      const ref = this.answerRefs[id];
-      if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
-        hoveredAnswerId = id;
-        this.setState({
-          organisms: this.state.organisms.map((circle) => {
-            return {
-              ...circle,
-              isDropReady: circle.id === organismId,
-            };
-          }),
-        });
-        break;
-      }
-    }
-    this.setState({ answerTriggered: hoveredAnswerId });
-  };
-
-  handleDropLanding = (e) => {
-    const organismId = e.target.id();
-    for (let id in this.answerRefs) {
-      const ref = this.answerRefs[id];
-      if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
-        this.setState({
-          answerActivated: id,
-          traceLines: {
-            ...this.state.traceLines,
-            [organismId]: {
-              ...this.state.traceLines[organismId],
-              confirmed: true,
-            },
-          },
-        });
-      }
-    }
-  };
+  updateDragState(isDragging) {
+    this.setState({
+      cursorType: isDragging ? "grabbing" : "grab",
+    });
+  }
 
   updateDragLine = (e) => {
     const id = e.target.id();
@@ -121,18 +88,52 @@ class App extends React.Component {
     });
   };
 
+  handleDragHover = (e) => {
+    const organismId = e.target.id();
+    let hoveredAnswerId = null;
+    for (let id in this.answerRefs) {
+      const ref = this.answerRefs[id];
+      if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
+        hoveredAnswerId = id;
+        break;
+      }
+    }
+    this.setState({
+      replyState: {
+        confirmed: false,
+        answerId: hoveredAnswerId,
+        organismId: organismId,
+      },
+    });
+  };
+
+  handleDropLanding = (e) => {
+    const organismId = e.target.id();
+    for (let id in this.answerRefs) {
+      const ref = this.answerRefs[id];
+      if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
+        this.setState({
+          traceLines: {
+            ...this.state.traceLines,
+            [organismId]: {
+              ...this.state.traceLines[organismId],
+              confirmed: true,
+            },
+          },
+
+          replyState: {
+            ...this.state.replyState,
+            confirmed: true,
+          },
+        });
+      }
+    }
+  };
+
   handleDragStart = (e) => {
     const id = e.target.id();
     this.updateDragLine(e);
-    this.setState({
-      cursorType: "grabbing",
-      organisms: this.state.organisms.map((circle) => {
-        return {
-          ...circle,
-          isDragging: circle.id === id,
-        };
-      }),
-    });
+    this.updateDragState(true, id);
   };
 
   handleDragMove = (e) => {
@@ -144,15 +145,7 @@ class App extends React.Component {
   handleDragEnd = (e) => {
     this.handleDropLanding(e);
     this.updateDragLine(e);
-    this.setState({
-      cursorType: "grab",
-      organisms: this.state.organisms.map((circle) => {
-        return {
-          ...circle,
-          isDragging: false,
-        };
-      }),
-    });
+    this.updateDragState(false);
   };
 
   render() {
@@ -194,7 +187,7 @@ class App extends React.Component {
                 x={o.x}
                 y={o.y}
                 rotation={o.isDropReady ? 45 : o.rotation}
-                isDragging={o.isDragging}
+                isDragging={o.id === this.state.draggedOrganismId}
                 onDragStart={this.handleDragStart}
                 onDragMove={this.handleDragMove}
                 onDragEnd={this.handleDragEnd}
