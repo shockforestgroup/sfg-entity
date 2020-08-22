@@ -23,7 +23,7 @@ const index = ({
           y={0}
           outerRadius={radius}
           ringWidth={6}
-          rotationFn={(_) => -90 - (i * 180) / options.length}
+          rotationFn={(_) => -90 - (i / (options.length - 1)) * 180}
         />
       );
     })}
