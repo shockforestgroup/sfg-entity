@@ -24,6 +24,7 @@ const index = ({
           outerRadius={radius}
           ringWidth={6}
           rotationFn={(_) => -90 - (i / (options.length - 1)) * 180}
+          opacity={0}
         />
       );
     })}

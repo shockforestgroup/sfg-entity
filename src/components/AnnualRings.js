@@ -16,10 +16,14 @@ class AnnualRings extends Component {
     };
   }
 
-  handleAnimationHasEnded() {
+  handleSingleRingAnimationHasEnded() {
+    const newLineIndex = this.state.lineIndex + 1;
     this.setState({
-      lineIndex: this.state.lineIndex + 1,
+      lineIndex: newLineIndex,
     });
+    if (newLineIndex >= this.state.lines.length) {
+      this.props.animationHasEnded();
+    }
   }
 
   render() {
@@ -34,10 +38,12 @@ class AnnualRings extends Component {
       inverted,
       hasTypeEffect,
       typeEffectSpeed,
+      opacity,
+      animationHasEnded,
     } = this.props;
 
     return (
-      <Group ref={innerRef}>
+      <Group ref={innerRef} opacity={opacity}>
         {this.state.lines.map(
           (text, i) =>
             i <= this.state.lineIndex && (
@@ -57,7 +63,7 @@ class AnnualRings extends Component {
                 hasTypeEffect={hasTypeEffect}
                 animationHasEnded={() => {
                   console.log("ended!");
-                  this.handleAnimationHasEnded();
+                  this.handleSingleRingAnimationHasEnded();
                 }}
                 typeEffectSpeed={typeEffectSpeed}
               />
@@ -75,6 +81,8 @@ AnnualRings.defaultProps = {
   rotationFn: () => 0,
   hasTypeEffect: false,
   typeEffectSpeed: 100,
+  opacity: 1,
+  animationHasEnded: () => {},
 };
 
 export default React.forwardRef((props, ref) => (

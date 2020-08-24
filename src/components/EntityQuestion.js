@@ -6,7 +6,7 @@ function splitTextIntoLines(text) {
   return text.split("\\n");
 }
 
-export default ({ text, radius }) => (
+export default ({ text, radius, animationHasEnded = () => {} }) => (
   <AnnualRings
     textLines={splitTextIntoLines(text)}
     x={0}
@@ -16,5 +16,6 @@ export default ({ text, radius }) => (
     rotationFn={(_) => 0}
     hasTypeEffect={true}
     typeEffectSpeed={0.01}
+    animationHasEnded={animationHasEnded}
   />
 );

@@ -131,6 +131,7 @@ class App extends React.Component {
   };
 
   handleDragStart = (e) => {
+    this.uncoverAnswers();
     const id = e.target.id();
     this.updateDragLine(e);
     this.updateDragState(true, id);
@@ -147,6 +148,16 @@ class App extends React.Component {
     this.updateDragLine(e);
     this.updateDragState(false);
   };
+
+  uncoverAnswers() {
+    for (let id in this.answerRefs) {
+      const ref = this.answerRefs[id];
+      ref.to({
+        opacity: 1,
+        duration: 0.8,
+      });
+    }
+  }
 
   render() {
     return (
@@ -168,6 +179,7 @@ class App extends React.Component {
             <EntityQuestion
               radius={this.state.bigCircle.radius}
               text="I'm here, like you, though I am dead and you are alive \n We both share an ability to remember. \n From when is your earliest memory?"
+              animationHasEnded={() => this.uncoverAnswers()}
             />
 
             <EntityAnswers
