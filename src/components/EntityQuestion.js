@@ -14,5 +14,6 @@ export default ({ text, radius }) => (
     outerRadius={radius}
     ringWidth={6}
     rotationFn={(_) => 0}
+    hasTypeEffect={true}
   />
 );
