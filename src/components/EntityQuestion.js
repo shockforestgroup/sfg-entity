@@ -15,5 +15,6 @@ export default ({ text, radius }) => (
     ringWidth={6}
     rotationFn={(_) => 0}
     hasTypeEffect={true}
+    typeEffectSpeed={0.01}
   />
 );

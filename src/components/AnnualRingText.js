@@ -26,7 +26,7 @@ export default class AnnualRingText extends Component {
     if (this.props.hasTypeEffect) {
       this.intervalID = setInterval(() => {
         this.updateText();
-      }, 100);
+      }, 1 / this.props.typeEffectSpeed);
     }
   }
 
@@ -57,4 +57,5 @@ export default class AnnualRingText extends Component {
 
 AnnualRingText.defaultProps = {
   animationHasEnded: () => {},
+  typeEffectSpeed: 100,
 };

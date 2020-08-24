@@ -1,52 +1,82 @@
-import React from "react";
+import React, { Component } from "react";
 import { Group } from "react-konva";
 import generateSVGPathCommandsForCircle from "../helpers/generateSVGPathCommandsForCircle";
-
 import AnnualRingText from "./AnnualRingText";
 
 const OUTER_PADDING = 15;
 
-const index = React.forwardRef(
-  (
-    {
-      textLines = [],
+class AnnualRings extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      lines: this.props.inverted
+        ? this.props.textLines.slice(0).reverse()
+        : this.props.textLines,
+      lineIndex: 0,
+    };
+  }
+
+  handleAnimationHasEnded() {
+    this.setState({
+      lineIndex: this.state.lineIndex + 1,
+    });
+  }
+
+  render() {
+    const {
+      innerRef,
       x,
       y,
-      textColor = "black",
+      textColor,
       outerRadius,
-      ringWidth = 50,
-      rotationFn = () => 0,
+      ringWidth,
+      rotationFn,
       inverted,
-      hasTypeEffect = false,
-    },
-    ref
-  ) => {
-    const lines = inverted ? textLines.slice(0).reverse() : textLines;
+      hasTypeEffect,
+      typeEffectSpeed,
+    } = this.props;
+
     return (
-      <Group ref={ref}>
-        {lines.map((text, i) => (
-          <AnnualRingText
-            key={text + i}
-            text={text}
-            textColor={textColor}
-            fill={textColor}
-            inverted={inverted}
-            rotation={rotationFn() + 180}
-            data={generateSVGPathCommandsForCircle({
-              radius: outerRadius - i * ringWidth * 4 - OUTER_PADDING,
-              x,
-              y,
-              inverted: inverted,
-            })}
-            hasTypeEffect={hasTypeEffect}
-            animationHasEnded={() => {
-              console.log("ended!");
-            }}
-          />
-        ))}
+      <Group ref={innerRef}>
+        {this.state.lines.map(
+          (text, i) =>
+            i <= this.state.lineIndex && (
+              <AnnualRingText
+                key={text + i}
+                text={text}
+                textColor={textColor}
+                fill={textColor}
+                inverted={inverted}
+                rotation={rotationFn() + 180}
+                data={generateSVGPathCommandsForCircle({
+                  radius: outerRadius - i * ringWidth * 4 - OUTER_PADDING,
+                  x,
+                  y,
+                  inverted: inverted,
+                })}
+                hasTypeEffect={hasTypeEffect}
+                animationHasEnded={() => {
+                  console.log("ended!");
+                  this.handleAnimationHasEnded();
+                }}
+                typeEffectSpeed={typeEffectSpeed}
+              />
+            )
+        )}
       </Group>
     );
   }
-);
+}
 
-export default index;
+AnnualRings.defaultProps = {
+  textLines: [],
+  textColor: "#000",
+  ringWidth: 50,
+  rotationFn: () => 0,
+  hasTypeEffect: false,
+  typeEffectSpeed: 100,
+};
+
+export default React.forwardRef((props, ref) => (
+  <AnnualRings innerRef={ref} {...props} />
+));
