@@ -39,18 +39,19 @@ class AnnualRings extends Component {
       hasTypeEffect,
       typeEffectSpeed,
       opacity,
-      animationHasEnded,
+      fontSize,
     } = this.props;
 
     return (
       <Group ref={innerRef} opacity={opacity}>
         {this.state.lines.map(
           (text, i) =>
-            i <= this.state.lineIndex && (
+            (i <= this.state.lineIndex || !hasTypeEffect) && (
               <AnnualRingText
                 key={text + i}
                 text={text}
                 textColor={textColor}
+                fontSize={fontSize}
                 fill={textColor}
                 inverted={inverted}
                 rotation={rotationFn() + 180}
@@ -77,6 +78,7 @@ class AnnualRings extends Component {
 AnnualRings.defaultProps = {
   textLines: [],
   textColor: "#000",
+  fontSize: 16,
   ringWidth: 50,
   rotationFn: () => 0,
   hasTypeEffect: false,
