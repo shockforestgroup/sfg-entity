@@ -9,7 +9,6 @@ import EntityAnswers from "./EntityAnswers";
 import EntityOrganism from "./EntityOrganism";
 
 import surveyData from "../content/survey-qanda";
-const questionText = surveyData.data.questions[11].text;
 
 function generateCircle() {
   return {
@@ -164,7 +163,7 @@ class Entity extends React.Component {
   render() {
     return (
       <>
-        <h2>State(From Entity): {this.props.count}</h2>
+        <h2>State(From Entity): {this.props.questionText}</h2>
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
@@ -182,8 +181,8 @@ class Entity extends React.Component {
 
               <EntityQuestion
                 radius={this.state.bigCircle.radius}
-                text={questionText}
-                animationHasEnded={() => this.uncoverAnswers()}
+                text={this.props.questionText}
+                onAnimationHasEnded={() => this.uncoverAnswers()}
               />
 
               <EntityAnswers
@@ -235,7 +234,7 @@ class Entity extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    count: state,
+    questionText: surveyData.data.questions[state].text,
   };
 };
 const mapDispatchToProps = (dispatch) => {

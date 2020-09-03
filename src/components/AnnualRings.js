@@ -9,20 +9,18 @@ class AnnualRings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      lines: this.props.inverted
-        ? this.props.textLines.slice(0).reverse()
-        : this.props.textLines,
       lineIndex: 0,
     };
   }
 
-  handleSingleRingAnimationHasEnded() {
+  handleSingleLineAnimationHasEnded() {
     const newLineIndex = this.state.lineIndex + 1;
     this.setState({
-      lineIndex: newLineIndex,
+      ...this.state,
+      lineIndex: this.state.lineIndex + 1,
     });
-    if (newLineIndex >= this.state.lines.length) {
-      this.props.animationHasEnded();
+    if (newLineIndex >= this.props.textLines.length) {
+      this.props.onAllLinesAnimationHasEnded();
     }
   }
 
@@ -40,13 +38,19 @@ class AnnualRings extends Component {
       typeEffectSpeed,
       opacity,
       fontSize,
+      textLines,
     } = this.props;
 
+    const { lineIndex } = this.state;
+
+    const lines = this.props.inverted
+      ? textLines.slice(0).reverse()
+      : textLines;
     return (
       <Group ref={innerRef} opacity={opacity}>
-        {this.state.lines.map(
+        {lines.map(
           (text, i) =>
-            (i <= this.state.lineIndex || !hasTypeEffect) && (
+            (i <= lineIndex || !hasTypeEffect) && (
               <AnnualRingText
                 key={text + i}
                 text={text}
@@ -63,8 +67,7 @@ class AnnualRings extends Component {
                 })}
                 hasTypeEffect={hasTypeEffect}
                 animationHasEnded={() => {
-                  console.log("ended!");
-                  this.handleSingleRingAnimationHasEnded();
+                  this.handleSingleLineAnimationHasEnded();
                 }}
                 typeEffectSpeed={typeEffectSpeed}
               />
@@ -76,6 +79,7 @@ class AnnualRings extends Component {
 }
 
 AnnualRings.defaultProps = {
+  lineIndex: 0,
   textLines: [],
   textColor: "#000",
   fontSize: 16,
@@ -84,9 +88,12 @@ AnnualRings.defaultProps = {
   hasTypeEffect: false,
   typeEffectSpeed: 100,
   opacity: 1,
-  animationHasEnded: () => {},
+  onAllLinesAnimationHasEnded: () => {},
 };
 
+/* Note: The 'key' prop is crucial here to help reset state if props change */
+/* See: https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key */
+
 export default React.forwardRef((props, ref) => (
-  <AnnualRings innerRef={ref} {...props} />
+  <AnnualRings key={props.textLines} innerRef={ref} {...props} />
 ));
