@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-
 import { Path } from "react-konva";
 
 const CELL_SHAPES = [
