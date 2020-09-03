@@ -9,6 +9,10 @@ import EntityOrganism from "./components/EntityOrganism";
 
 import "./App.css";
 
+import surveyData from "./content/survey-qanda";
+const questionText = surveyData.data.questions[11].text;
+console.log(questionText);
+
 function generateCircle() {
   return {
     radius: window.innerHeight / 2 - 20,
@@ -178,7 +182,7 @@ class App extends React.Component {
 
             <EntityQuestion
               radius={this.state.bigCircle.radius}
-              text="I'm here, like you, though I am dead and you are alive \n We both share an ability to remember. \n From when is your earliest memory?"
+              text={questionText}
               animationHasEnded={() => this.uncoverAnswers()}
             />
 

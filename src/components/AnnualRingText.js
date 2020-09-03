@@ -36,14 +36,14 @@ export default class AnnualRingText extends Component {
   }
 
   render() {
-    const { textColor, inverted, rotation, data } = this.props;
+    const { textColor, inverted, rotation, data, fontSize } = this.props;
     const { text } = this.state;
     return (
       <TextPath
         text={text}
         fill={textColor}
-        fontSize={16}
-        fontFamily="Arial"
+        fontSize={fontSize}
+        fontFamily="Inconsolata"
         align="center"
         textBaseline={inverted ? "bottom" : "top"}
         rotation={rotation}
@@ -58,4 +58,5 @@ export default class AnnualRingText extends Component {
 AnnualRingText.defaultProps = {
   animationHasEnded: () => {},
   typeEffectSpeed: 100,
+  fontSize: 16,
 };
