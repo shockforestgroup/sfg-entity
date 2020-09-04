@@ -5,7 +5,7 @@ const surveyQuestions = surveyData.data.questions;
 const initialState = {
   data: surveyQuestions,
   step: 0,
-  hasStarted: false,
+  hasStarted: true,
   hasEnded: false,
 };
 

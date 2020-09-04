@@ -10,10 +10,18 @@ import EntityOrganism from "./EntityOrganism";
 import EntityStartPrompt from "./EntityStartPrompt";
 
 const WAIT_AFTER_ANSWER_SELECT = 700;
+const ENTITY_MARGIN = 20;
 
 function generateCircle() {
+  let dimension =
+    window.innerWidth > window.innerHeight
+      ? window.innerHeight
+      : window.innerWidth;
+  if (dimension < 635) {
+    dimension = 635;
+  }
   return {
-    radius: window.innerHeight / 2 - 20,
+    radius: dimension / 2 - ENTITY_MARGIN,
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
   };
@@ -34,6 +42,7 @@ class Entity extends React.Component {
     super(props);
     const circle = generateCircle();
     this.state = {
+      zoomFactor: 1, //0.6,
       bigCircle: circle,
       organisms: generateOrganisms(circle),
       traceLines: {},
@@ -48,6 +57,19 @@ class Entity extends React.Component {
 
   answerRefs = {};
   startTriggerRef = null;
+  entityLayerRef = null;
+
+  scaleEntity() {
+    if (!this.entityLayerRef) return;
+    this.entityLayerRef.to({
+      scaleX: 1,
+      scaleY: 1,
+      duration: 1,
+      onFinish: () => {
+        this.setState({ zoomFactor: 1 });
+      },
+    });
+  }
 
   calculateCellCenter = (e) => {
     const rect = e.target.getClientRect();
@@ -114,6 +136,7 @@ class Entity extends React.Component {
     ) {
       setTimeout(() => {
         this.props.startGame();
+        this.scaleEntity();
       }, WAIT_AFTER_ANSWER_SELECT);
       return;
     }
@@ -175,6 +198,7 @@ class Entity extends React.Component {
   }
 
   render() {
+    //this.scaleEntity();
     return (
       <>
         <div
@@ -194,7 +218,14 @@ class Entity extends React.Component {
           style={{ cursor: this.state.cursorType }}
         >
           <Layer>
-            <Group x={this.state.bigCircle.x} y={this.state.bigCircle.y}>
+            <Group
+              x={this.state.bigCircle.x}
+              y={this.state.bigCircle.y}
+              scale={{ x: this.state.zoomFactor, y: this.state.zoomFactor }}
+              ref={(node) => {
+                this.entityLayerRef = node;
+              }}
+            >
               <Circle
                 x={0}
                 y={0}
@@ -222,12 +253,20 @@ class Entity extends React.Component {
                   }}
                 />
               ) : (
-                <EntityStartPrompt
-                  radius={this.state.bigCircle.radius}
-                  createRef={(ref) => {
-                    this.startTriggerRef = ref;
+                <Group
+                  y={-200}
+                  scale={{
+                    x: 1 / this.state.zoomFactor,
+                    y: 1 / this.state.zoomFactor,
                   }}
-                />
+                >
+                  <EntityStartPrompt
+                    radius={this.state.bigCircle.radius}
+                    createRef={(ref) => {
+                      this.startTriggerRef = ref;
+                    }}
+                  />
+                </Group>
               )}
 
               {this.state.organisms.map((o) => (
