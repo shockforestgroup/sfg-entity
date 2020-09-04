@@ -1,4 +1,9 @@
+import surveyData from "../content/survey-qanda";
+
+const surveyQuestions = surveyData.data.questions;
+
 const initialState = {
+  data: surveyQuestions,
   step: 0,
   hasStarted: false,
 };
@@ -8,7 +13,13 @@ const countReducer = function (state = initialState, action) {
     case "START":
       return { ...state, hasStarted: true };
     case "NEXT":
-      return { ...state, step: state.step + 1 };
+      if (state.step >= state.data.length - 1) {
+        return state;
+      }
+      return {
+        ...state,
+        step: state.step + 1,
+      };
     case "PREVIOUS":
       return { ...state, step: state.step - 1 };
     default:

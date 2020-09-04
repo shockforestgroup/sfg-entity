@@ -15,10 +15,10 @@ const mapDispatchToProps = (dispatch) => {
 const GameController = connect(
   mapStateToProps,
   mapDispatchToProps
-)(({ gameState, handleIncrementClick, handleDecrementClick }) => {
+)(({ handleIncrementClick, handleDecrementClick }) => {
   return (
-    <div style={{ border: "2px solid blue" }}>
-      <small>State of game: {JSON.stringify(gameState)}</small>
+    <div style={{ border: "2px solid blue", position: "absolute", zIndex: 10 }}>
+      <small>State of game:</small>
       <button onClick={handleDecrementClick}>Previous Question</button>
       <button onClick={handleIncrementClick}>Next Question</button>
     </div>

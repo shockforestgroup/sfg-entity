@@ -9,8 +9,6 @@ import EntityAnswers from "./EntityAnswers";
 import EntityOrganism from "./EntityOrganism";
 import EntityStartPrompt from "./EntityStartPrompt";
 
-import surveyData from "../content/survey-qanda";
-
 const WAIT_AFTER_ANSWER_SELECT = 700;
 
 function generateCircle() {
@@ -179,8 +177,16 @@ class Entity extends React.Component {
   render() {
     return (
       <>
-        <small>State(From Entity): {this.props.questionText}</small>
-        <small>State(From Entity): {JSON.stringify(this.props.answers)}</small>
+        <div
+          style={{
+            position: "absolute",
+            top: "20px",
+            width: "300px",
+          }}
+        >
+          <p>Question: {this.props.questionText}</p>
+          <p>Answers: {JSON.stringify(this.props.answers)}</p>
+        </div>
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
@@ -263,13 +269,11 @@ class Entity extends React.Component {
 const mapStateToProps = (state) => {
   return {
     hasStarted: state.hasStarted,
-    questionText: surveyData.data.questions[state.step].text,
-    answers: surveyData.data.questions[state.step].answers.map(
-      (answerText, i) => ({
-        id: i,
-        text: answerText,
-      })
-    ),
+    questionText: state.data[state.step].text,
+    answers: state.data[state.step].answers.map((answerText, i) => ({
+      id: i,
+      text: answerText,
+    })),
   };
 };
 const mapDispatchToProps = (dispatch) => {
