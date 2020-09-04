@@ -186,6 +186,7 @@ class Entity extends React.Component {
         >
           <p>Question: {this.props.questionText}</p>
           <p>Answers: {JSON.stringify(this.props.answers)}</p>
+          <p>Has ended: {this.props.hasEnded}</p>
         </div>
         <Stage
           width={window.innerWidth}
@@ -269,6 +270,7 @@ class Entity extends React.Component {
 const mapStateToProps = (state) => {
   return {
     hasStarted: state.hasStarted,
+    hasEnded: state.hasEnded,
     questionText: state.data[state.step].text,
     answers: state.data[state.step].answers.map((answerText, i) => ({
       id: i,

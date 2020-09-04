@@ -6,6 +6,7 @@ const initialState = {
   data: surveyQuestions,
   step: 0,
   hasStarted: false,
+  hasEnded: false,
 };
 
 const countReducer = function (state = initialState, action) {
@@ -14,7 +15,10 @@ const countReducer = function (state = initialState, action) {
       return { ...state, hasStarted: true };
     case "NEXT":
       if (state.step >= state.data.length - 1) {
-        return state;
+        return {
+          ...state,
+          hasEnded: true,
+        };
       }
       return {
         ...state,
