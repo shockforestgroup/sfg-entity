@@ -16,6 +16,7 @@ const index = ({
         <AnnualRings
           key={id}
           ref={(ref) => createRef(id, ref)}
+          fontSize={14}
           inverted={true}
           textLines={[text]}
           textColor={isActivated ? "red" : isTriggered ? "green" : "black"}

@@ -10,6 +10,8 @@ import EntityOrganism from "./EntityOrganism";
 
 import surveyData from "../content/survey-qanda";
 
+const WAIT_AFTER_ANSWER_SELECT = 700;
+
 function generateCircle() {
   return {
     radius: window.innerHeight / 2 - 20,
@@ -27,13 +29,6 @@ function generateOrganisms(circle) {
     rotation: Math.random() * 180,
   }));
 }
-
-const ANSWERS = [
-  { id: "1", text: "when I was 1" },
-  { id: "2", text: "when I was 2" },
-  { id: "3", text: "when I was 3" },
-  { id: "4", text: "when I was 5" },
-];
 
 class Entity extends React.Component {
   constructor(props) {
@@ -94,6 +89,7 @@ class Entity extends React.Component {
     let hoveredAnswerId = null;
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
+      if (!ref) return;
       if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
         hoveredAnswerId = id;
         break;
@@ -127,6 +123,9 @@ class Entity extends React.Component {
             confirmed: true,
           },
         });
+        setTimeout(() => {
+          this.props.goToNextQuestion();
+        }, WAIT_AFTER_ANSWER_SELECT);
       }
     }
   };
@@ -153,6 +152,7 @@ class Entity extends React.Component {
   uncoverAnswers() {
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
+      if (!ref) return;
       ref.to({
         opacity: 1,
         duration: 0.8,
@@ -161,9 +161,11 @@ class Entity extends React.Component {
   }
 
   render() {
+    console.log(this.props.answers);
     return (
       <>
-        <h2>State(From Entity): {this.props.questionText}</h2>
+        <small>State(From Entity): {this.props.questionText}</small>
+        <small>State(From Entity): {JSON.stringify(this.props.answers)}</small>
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
@@ -186,7 +188,7 @@ class Entity extends React.Component {
               />
 
               <EntityAnswers
-                options={ANSWERS}
+                options={this.props.answers}
                 radius={this.state.bigCircle.radius}
                 currentActivated={this.state.answerActivated}
                 currentTriggered={this.state.answerTriggered}
@@ -234,11 +236,17 @@ class Entity extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    questionText: surveyData.data.questions[state].text,
+    questionText: surveyData.data.questions[state.step].text,
+    answers: surveyData.data.questions[state.step].answers.map(
+      (answerText, i) => ({
+        id: i,
+        text: answerText,
+      })
+    ),
   };
 };
 const mapDispatchToProps = (dispatch) => {
-  return {};
+  return { goToNextQuestion: () => dispatch({ type: "NEXT" }) };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Entity);

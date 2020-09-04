@@ -1,9 +1,13 @@
-const countReducer = function (state = 0, action) {
+const initialState = {
+  step: 0,
+};
+
+const countReducer = function (state = initialState, action) {
   switch (action.type) {
-    case "INCREMENT":
-      return state + 1;
-    case "DECREMENT":
-      return state - 1;
+    case "NEXT":
+      return { ...state, step: state.step + 1 };
+    case "PREVIOUS":
+      return { ...state, step: state.step - 1 };
     default:
       return state;
   }
