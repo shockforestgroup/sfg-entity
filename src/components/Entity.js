@@ -114,7 +114,9 @@ class Entity extends React.Component {
         this.startTriggerRef.getClientRect()
       )
     ) {
-      this.props.startGame();
+      setTimeout(() => {
+        this.props.startGame();
+      }, WAIT_AFTER_ANSWER_SELECT);
       return;
     }
 
@@ -122,6 +124,7 @@ class Entity extends React.Component {
 
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
+      if (!ref) return;
       if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
         this.setState({
           traceLines: {
@@ -145,7 +148,6 @@ class Entity extends React.Component {
   };
 
   handleDragStart = (e) => {
-    this.uncoverAnswers();
     const id = e.target.id();
     this.updateDragLine(e);
     this.updateDragState(true, id);
