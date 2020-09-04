@@ -52,7 +52,7 @@ class AnnualRings extends Component {
           (text, i) =>
             (i <= lineIndex || !hasTypeEffect) && (
               <AnnualRingText
-                key={text + i}
+                key={text}
                 text={text}
                 textColor={textColor}
                 fontSize={fontSize}

@@ -1,6 +1,10 @@
 import React from "react";
 import AnnualRings from "./AnnualRings";
 
+function splitTextIntoLines(text) {
+  return text.split("\n");
+}
+
 const index = ({
   options,
   radius,
@@ -18,7 +22,7 @@ const index = ({
           ref={(ref) => createRef(id, ref)}
           fontSize={14}
           inverted={true}
-          textLines={[text]}
+          textLines={splitTextIntoLines(text)}
           textColor={isActivated ? "red" : isTriggered ? "green" : "black"}
           x={0}
           y={0}

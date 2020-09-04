@@ -6,7 +6,10 @@ import GameController from "./components/GameController";
 
 import countReducer from "./redux/reducer.js";
 
-let store = createStore(countReducer);
+let store = createStore(
+  countReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
 
 const App = () => (
   <Provider store={store}>

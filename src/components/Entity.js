@@ -7,6 +7,7 @@ import haveIntersection from "../helpers/haveIntersection";
 import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
 import EntityOrganism from "./EntityOrganism";
+import EntityStartPrompt from "./EntityStartPrompt";
 
 import surveyData from "../content/survey-qanda";
 
@@ -48,6 +49,7 @@ class Entity extends React.Component {
   }
 
   answerRefs = {};
+  startTriggerRef = null;
 
   calculateCellCenter = (e) => {
     const rect = e.target.getClientRect();
@@ -105,7 +107,19 @@ class Entity extends React.Component {
   };
 
   handleDropLanding = (e) => {
+    if (
+      !this.props.hasStarted &&
+      haveIntersection(
+        e.target.getClientRect(),
+        this.startTriggerRef.getClientRect()
+      )
+    ) {
+      this.props.startGame();
+      return;
+    }
+
     const organismId = e.target.id();
+
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
@@ -161,7 +175,6 @@ class Entity extends React.Component {
   }
 
   render() {
-    console.log(this.props.answers);
     return (
       <>
         <small>State(From Entity): {this.props.questionText}</small>
@@ -181,21 +194,32 @@ class Entity extends React.Component {
                 fill="#fff"
               />
 
-              <EntityQuestion
-                radius={this.state.bigCircle.radius}
-                text={this.props.questionText}
-                onAnimationHasEnded={() => this.uncoverAnswers()}
-              />
+              {this.props.hasStarted && (
+                <EntityQuestion
+                  radius={this.state.bigCircle.radius}
+                  text={this.props.questionText}
+                  onAnimationHasEnded={() => this.uncoverAnswers()}
+                />
+              )}
 
-              <EntityAnswers
-                options={this.props.answers}
-                radius={this.state.bigCircle.radius}
-                currentActivated={this.state.answerActivated}
-                currentTriggered={this.state.answerTriggered}
-                createRef={(answerId, ref) => {
-                  this.answerRefs[answerId] = ref;
-                }}
-              />
+              {this.props.hasStarted ? (
+                <EntityAnswers
+                  options={this.props.answers}
+                  radius={this.state.bigCircle.radius}
+                  currentActivated={this.state.answerActivated}
+                  currentTriggered={this.state.answerTriggered}
+                  createRef={(answerId, ref) => {
+                    this.answerRefs[answerId] = ref;
+                  }}
+                />
+              ) : (
+                <EntityStartPrompt
+                  radius={this.state.bigCircle.radius}
+                  createRef={(ref) => {
+                    this.startTriggerRef = ref;
+                  }}
+                />
+              )}
 
               {this.state.organisms.map((o) => (
                 <EntityOrganism
@@ -236,6 +260,7 @@ class Entity extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
+    hasStarted: state.hasStarted,
     questionText: surveyData.data.questions[state.step].text,
     answers: surveyData.data.questions[state.step].answers.map(
       (answerText, i) => ({
@@ -246,7 +271,10 @@ const mapStateToProps = (state) => {
   };
 };
 const mapDispatchToProps = (dispatch) => {
-  return { goToNextQuestion: () => dispatch({ type: "NEXT" }) };
+  return {
+    startGame: () => dispatch({ type: "START" }),
+    goToNextQuestion: () => dispatch({ type: "NEXT" }),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Entity);
