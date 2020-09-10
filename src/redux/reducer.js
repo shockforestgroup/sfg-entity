@@ -25,6 +25,9 @@ const countReducer = function (state = initialState, action) {
         step: state.step + 1,
       };
     case "PREVIOUS":
+      if (state.step === 0) {
+        return state;
+      }
       return { ...state, step: state.step - 1 };
     default:
       return state;
