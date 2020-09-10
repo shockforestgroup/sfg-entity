@@ -85,11 +85,15 @@ export default class EntityOrganismPhysics extends Component {
     // add some bodies that to be attracted
     for (var i = 0; i < 150; i += 1) {
       // var body = Bodies.circle(210, 100, 30, { restitution: 0.5 });
-      var body = Bodies.polygon(
+      var size = Common.random(10, 20);
+      var body = Bodies.rectangle(
         Common.random(0, render.options.width), 
         Common.random(0, render.options.height),
-        Common.random(1, 5),
-        Common.random() > 0.9 ? Common.random(15, 25) : Common.random(5, 10)
+        size,
+        size,
+        { 
+          chamfer: { radius: [size*.75, size*.3, size*.75, size*.3] }
+        }
       );
 
       World.add(world, body);
