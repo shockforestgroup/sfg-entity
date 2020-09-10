@@ -6,6 +6,7 @@ import getRandomInRange from "../helpers/getRandomInRange";
 import haveIntersection from "../helpers/haveIntersection";
 import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
+import EntityOrganism from "./EntityOrganism";
 import EntityOrganismPhysics from "./EntityOrganismPhysics";
 import EntityStartPrompt from "./EntityStartPrompt";
 
@@ -212,7 +213,7 @@ class Entity extends React.Component {
     //this.scaleEntity();
     return (
       <>
-        <div
+        {/* <div
           style={{
             position: "absolute",
             top: "20px",
@@ -222,6 +223,9 @@ class Entity extends React.Component {
           <p>Question: {this.props.questionText}</p>
           <p>Answers: {JSON.stringify(this.props.answers)}</p>
           <p>Has ended: {this.props.hasEnded}</p>
+        </div> */}
+        <div>
+          <EntityOrganismPhysics />
         </div>
         <Stage
           width={window.innerWidth}
@@ -281,7 +285,7 @@ class Entity extends React.Component {
               )}
 
               {this.state.organisms.map((o) => (
-                <EntityOrganismPhysics
+                <EntityOrganism
                   key={o.id}
                   id={o.id}
                   x={o.x}
