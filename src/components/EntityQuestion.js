@@ -15,7 +15,7 @@ export default ({ text, radius, onAnimationHasEnded = () => {} }) => (
     outerRadius={radius}
     ringWidth={4}
     rotationFn={(_) => 0}
-    hasTypeEffect={false}
+    hasTypeEffect={true}
     typeEffectSpeed={0.01}
     onAllLinesAnimationHasEnded={onAnimationHasEnded}
   />
