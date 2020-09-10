@@ -6,7 +6,7 @@ import getRandomInRange from "../helpers/getRandomInRange";
 import haveIntersection from "../helpers/haveIntersection";
 import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
-import EntityOrganism from "./EntityOrganism";
+import EntityOrganismPhysics from "./EntityOrganismPhysics";
 import EntityStartPrompt from "./EntityStartPrompt";
 
 const WAIT_AFTER_ANSWER_SELECT = 700;
@@ -281,7 +281,7 @@ class Entity extends React.Component {
               )}
 
               {this.state.organisms.map((o) => (
-                <EntityOrganism
+                <EntityOrganismPhysics
                   key={o.id}
                   id={o.id}
                   x={o.x}
