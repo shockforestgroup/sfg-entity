@@ -42,6 +42,7 @@ class Entity extends React.Component {
     super(props);
     const circle = generateCircle();
     this.state = {
+      screenWidth: window.innerWidth,
       zoomFactor: 1, //0.6,
       bigCircle: circle,
       organisms: generateOrganisms(circle),
@@ -58,6 +59,15 @@ class Entity extends React.Component {
   answerRefs = {};
   startTriggerRef = null;
   entityLayerRef = null;
+
+  componentDidMount() {
+    window.addEventListener("resize", () => this.handleResize());
+  }
+
+  handleResize() {
+    const circle = generateCircle();
+    this.setState({ screenWidth: window.innerWidth, bigCircle: circle });
+  }
 
   scaleEntity() {
     if (!this.entityLayerRef) return;
@@ -198,6 +208,7 @@ class Entity extends React.Component {
   }
 
   render() {
+    console.log("render");
     //this.scaleEntity();
     return (
       <>
