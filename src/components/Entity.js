@@ -9,6 +9,8 @@ import EntityAnswers from "./EntityAnswers";
 import EntityOrganism from "./EntityOrganism";
 import EntityStartPrompt from "./EntityStartPrompt";
 
+import SoundMaker from "../sounds/SoundMaker";
+
 const WAIT_AFTER_ANSWER_SELECT = 700;
 const ENTITY_MARGIN = 20;
 
@@ -136,9 +138,8 @@ class Entity extends React.Component {
     });
   };
 
-  handleDropLanding = (e) => {
+  handleDropLandingStart = (e) => {
     if (
-      !this.props.hasStarted &&
       haveIntersection(
         e.target.getClientRect(),
         this.startTriggerRef.getClientRect()
@@ -150,9 +151,17 @@ class Entity extends React.Component {
       }, WAIT_AFTER_ANSWER_SELECT);
       return;
     }
+  };
+
+  handleDropLanding = (e) => {
+    if (!this.props.hasStarted) {
+      this.handleDropLandingStart(e);
+      return;
+    }
 
     const organismId = e.target.id();
 
+    let answerCount = 0;
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (!ref) return;
@@ -171,10 +180,12 @@ class Entity extends React.Component {
             confirmed: true,
           },
         });
+        SoundMaker.playAnswerSound(answerCount);
         setTimeout(() => {
           this.props.goToNextQuestion();
         }, WAIT_AFTER_ANSWER_SELECT);
       }
+      answerCount++;
     }
   };
 

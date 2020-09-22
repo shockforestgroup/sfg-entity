@@ -7,7 +7,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    handleIncrementClick: () => dispatch({ type: "NEXT" }),
+    handleIncrementClick: () => {
+      dispatch({ type: "NEXT" });
+    },
     handleDecrementClick: () => dispatch({ type: "PREVIOUS" }),
   };
 };
