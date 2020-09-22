@@ -9,20 +9,23 @@ const answerSounds = [soundAnswer1, soundAnswer2, soundAnswer3, soundAnswer4];
 
 class SoundMaker {
   constructor() {
-    this.pointerSoundAudio = null;
+    this.pointerSoundAudio = new Audio(soundPointer);
+    this.pointerSoundAudio.loop = true;
+    this.backgroundSound = new Audio(soundBackground);
+    this.backgroundSound.loop = true;
   }
-
   playAnswerSound(answerID) {
     const audio = new Audio(answerSounds[answerID % answerSounds.length]);
     audio.play();
   }
   playPointerSound() {
-    this.pointerSoundAudio = new Audio(soundPointer);
-    this.pointerSoundAudio.loop = true;
     this.pointerSoundAudio.play();
   }
   stopPointerSound() {
     this.pointerSoundAudio.pause();
+  }
+  playBackgroundSound() {
+    this.backgroundSound.play();
   }
 }
 

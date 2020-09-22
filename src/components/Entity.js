@@ -145,6 +145,7 @@ class Entity extends React.Component {
         this.startTriggerRef.getClientRect()
       )
     ) {
+      SoundMaker.playBackgroundSound();
       setTimeout(() => {
         this.props.startGame();
         this.scaleEntity();
