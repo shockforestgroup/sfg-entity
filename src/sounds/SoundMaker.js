@@ -13,9 +13,10 @@ class SoundMaker {
     this.pointerSoundAudio.loop = true;
     this.backgroundSound = new Audio(soundBackground);
     this.backgroundSound.loop = true;
+    this.answerSounds = answerSounds.map((sound) => new Audio(sound));
   }
   playAnswerSound(answerID) {
-    const audio = new Audio(answerSounds[answerID % answerSounds.length]);
+    const audio = this.answerSounds[answerID % this.answerSounds.length];
     audio.play();
   }
   playPointerSound() {
