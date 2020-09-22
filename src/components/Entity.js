@@ -190,6 +190,7 @@ class Entity extends React.Component {
   };
 
   handleDragStart = (e) => {
+    SoundMaker.playPointerSound();
     const id = e.target.id();
     this.updateDragLine(e);
     this.updateDragState(true, id);
@@ -202,6 +203,7 @@ class Entity extends React.Component {
   };
 
   handleDragEnd = (e) => {
+    SoundMaker.stopPointerSound();
     this.handleDropLanding(e);
     this.updateDragLine(e);
     this.updateDragState(false);

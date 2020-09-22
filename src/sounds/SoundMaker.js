@@ -8,9 +8,21 @@ import soundPointer from "./pointer.mp3";
 const answerSounds = [soundAnswer1, soundAnswer2, soundAnswer3, soundAnswer4];
 
 class SoundMaker {
+  constructor() {
+    this.pointerSoundAudio = null;
+  }
+
   playAnswerSound(answerID) {
     const audio = new Audio(answerSounds[answerID % answerSounds.length]);
     audio.play();
+  }
+  playPointerSound() {
+    this.pointerSoundAudio = new Audio(soundPointer);
+    this.pointerSoundAudio.loop = true;
+    this.pointerSoundAudio.play();
+  }
+  stopPointerSound() {
+    this.pointerSoundAudio.pause();
   }
 }
 
