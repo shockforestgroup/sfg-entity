@@ -13,7 +13,6 @@ import SoundMaker from "../sounds/SoundMaker";
 import { isDebugMode } from "../helpers/readEnvVar.js";
 import settings from "../settings";
 
-const WAIT_AFTER_ANSWER_SELECT = 700;
 const ENTITY_MARGIN = 20;
 
 function generateCircle() {
@@ -151,7 +150,7 @@ class Entity extends React.Component {
       setTimeout(() => {
         this.props.startGame();
         this.scaleEntity();
-      }, WAIT_AFTER_ANSWER_SELECT);
+      }, settings.WAIT_AFTER_ANSWER_SELECT);
       return;
     }
   };
@@ -186,7 +185,7 @@ class Entity extends React.Component {
         SoundMaker.playAnswerSound(answerCount);
         setTimeout(() => {
           this.props.goToNextQuestion();
-        }, WAIT_AFTER_ANSWER_SELECT);
+        }, settings.WAIT_AFTER_ANSWER_SELECT);
       }
       answerCount++;
     }
