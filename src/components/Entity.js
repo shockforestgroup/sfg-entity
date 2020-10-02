@@ -13,7 +13,7 @@ import SoundMaker from "../sounds/SoundMaker";
 import { isDebugMode } from "../helpers/readEnvVar.js";
 import settings from "../settings";
 
-const ENTITY_MARGIN = 20;
+const ENTITY_MARGIN = 0;
 
 function generateCircle() {
   let dimension =
