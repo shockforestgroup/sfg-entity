@@ -3,6 +3,9 @@ import { Group } from "react-konva";
 import generateSVGPathCommandsForCircle from "../helpers/generateSVGPathCommandsForCircle";
 import AnnualRingText from "./AnnualRingText";
 
+import { isDebugMode } from "../helpers/readEnvVar.js";
+import settings from "../settings";
+
 const OUTER_PADDING = 15;
 
 class AnnualRings extends Component {
@@ -54,7 +57,9 @@ class AnnualRings extends Component {
               <AnnualRingText
                 key={text}
                 text={text}
-                textColor={textColor}
+                textColor={
+                  isDebugMode ? settings.ENTITY_TEXT_COLOR_DEBUG : textColor
+                }
                 fontSize={fontSize}
                 fill={textColor}
                 inverted={inverted}
@@ -81,7 +86,7 @@ class AnnualRings extends Component {
 AnnualRings.defaultProps = {
   lineIndex: 0,
   textLines: [],
-  textColor: "#000",
+  textColor: settings.ENTITY_TEXT_COLOR,
   fontSize: 16,
   ringWidth: 50,
   rotationFn: () => 0,

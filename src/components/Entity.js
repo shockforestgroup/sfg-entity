@@ -8,8 +8,10 @@ import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
 import EntityOrganism from "./EntityOrganism";
 import EntityStartPrompt from "./EntityStartPrompt";
-
 import SoundMaker from "../sounds/SoundMaker";
+
+import { isDebugMode } from "../helpers/readEnvVar.js";
+import settings from "../settings";
 
 const WAIT_AFTER_ANSWER_SELECT = 700;
 const ENTITY_MARGIN = 20;
@@ -245,7 +247,11 @@ class Entity extends React.Component {
                 y={0}
                 radius={this.state.bigCircle.radius}
                 stroke="black"
-                fill="#fff"
+                fill={
+                  isDebugMode
+                    ? settings.ENTITY_BG_COLOR_DEBUG
+                    : settings.ENTITY_BG_COLOR
+                }
               />
 
               {this.props.hasStarted && (
