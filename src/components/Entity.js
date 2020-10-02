@@ -226,17 +226,6 @@ class Entity extends React.Component {
     //this.scaleEntity();
     return (
       <>
-        <div
-          style={{
-            position: "absolute",
-            top: "20px",
-            width: "300px",
-          }}
-        >
-          <p>Question: {this.props.questionText}</p>
-          <p>Answers: {JSON.stringify(this.props.answers)}</p>
-          <p>Has ended: {this.props.hasEnded}</p>
-        </div>
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}

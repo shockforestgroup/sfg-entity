@@ -5,7 +5,8 @@ import Entity from "./components/Entity";
 import GameController from "./components/GameController";
 import countReducer from "./redux/reducer.js";
 
-const debugMode = !!process.env.REACT_APP_DEBUG_MODE;
+/* Env vars are strings & dotenv doesnt support boolean out of the box... */
+const debugMode = !!parseInt(process.env.REACT_APP_DEBUG_MODE);
 
 let store = createStore(
   countReducer,
