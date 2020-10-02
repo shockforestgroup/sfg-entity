@@ -3,8 +3,9 @@ import { Provider } from "react-redux";
 import { createStore } from "redux";
 import Entity from "./components/Entity";
 import GameController from "./components/GameController";
-
 import countReducer from "./redux/reducer.js";
+
+const debugMode = !!process.env.REACT_APP_DEBUG_MODE;
 
 let store = createStore(
   countReducer,
@@ -13,7 +14,7 @@ let store = createStore(
 
 const App = () => (
   <Provider store={store}>
-    <GameController />
+    {debugMode && <GameController />}
     <Entity />
   </Provider>
 );
