@@ -6,6 +6,7 @@ import GameController from "./components/GameController";
 import EntityOrganismPhysics from "./components/EntityOrganismPhysics";
 
 import countReducer from "./redux/reducer.js";
+import { isDebugMode } from "./helpers/readEnvVar.js";
 
 let store = createStore(
   countReducer,
@@ -14,7 +15,7 @@ let store = createStore(
 
 const App = () => (
   <Provider store={store}>
-    <GameController />
+    {isDebugMode && <GameController />}
     <Entity />
     {/* <EntityOrganismPhysics /> */}
   </Provider>

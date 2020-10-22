@@ -9,9 +9,12 @@ import EntityAnswers from "./EntityAnswers";
 import EntityOrganism from "./EntityOrganism";
 import EntityOrganismPhysics from "./EntityOrganismPhysics";
 import EntityStartPrompt from "./EntityStartPrompt";
+import SoundMaker from "../sounds/SoundMaker";
 
-const WAIT_AFTER_ANSWER_SELECT = 700;
-const ENTITY_MARGIN = 20;
+import { isDebugMode } from "../helpers/readEnvVar.js";
+import settings from "../settings";
+
+const ENTITY_MARGIN = 0;
 
 function generateCircle() {
   let dimension =
@@ -137,23 +140,31 @@ class Entity extends React.Component {
     });
   };
 
-  handleDropLanding = (e) => {
+  handleDropLandingStart = (e) => {
     if (
-      !this.props.hasStarted &&
       haveIntersection(
         e.target.getClientRect(),
         this.startTriggerRef.getClientRect()
       )
     ) {
+      SoundMaker.playBackgroundSound();
       setTimeout(() => {
         this.props.startGame();
         this.scaleEntity();
-      }, WAIT_AFTER_ANSWER_SELECT);
+      }, settings.WAIT_AFTER_ANSWER_SELECT);
+      return;
+    }
+  };
+
+  handleDropLanding = (e) => {
+    if (!this.props.hasStarted) {
+      this.handleDropLandingStart(e);
       return;
     }
 
     const organismId = e.target.id();
 
+    let answerCount = 0;
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (!ref) return;
@@ -172,14 +183,17 @@ class Entity extends React.Component {
             confirmed: true,
           },
         });
+        SoundMaker.playAnswerSound(answerCount);
         setTimeout(() => {
           this.props.goToNextQuestion();
-        }, WAIT_AFTER_ANSWER_SELECT);
+        }, settings.WAIT_AFTER_ANSWER_SELECT);
       }
+      answerCount++;
     }
   };
 
   handleDragStart = (e) => {
+    SoundMaker.playPointerSound();
     const id = e.target.id();
     this.updateDragLine(e);
     this.updateDragState(true, id);
@@ -192,6 +206,7 @@ class Entity extends React.Component {
   };
 
   handleDragEnd = (e) => {
+    SoundMaker.stopPointerSound();
     this.handleDropLanding(e);
     this.updateDragLine(e);
     this.updateDragState(false);
@@ -213,17 +228,6 @@ class Entity extends React.Component {
     //this.scaleEntity();
     return (
       <>
-        {/* <div
-          style={{
-            position: "absolute",
-            top: "20px",
-            width: "300px",
-          }}
-        >
-          <p>Question: {this.props.questionText}</p>
-          <p>Answers: {JSON.stringify(this.props.answers)}</p>
-          <p>Has ended: {this.props.hasEnded}</p>
-        </div> */}
         <div>
           <EntityOrganismPhysics />
         </div>
@@ -246,7 +250,11 @@ class Entity extends React.Component {
                 y={0}
                 radius={this.state.bigCircle.radius}
                 stroke="black"
-                fill="#fff"
+                fill={
+                  isDebugMode
+                    ? settings.ENTITY_BG_COLOR_DEBUG
+                    : settings.ENTITY_BG_COLOR
+                }
               />
 
               {this.props.hasStarted && (

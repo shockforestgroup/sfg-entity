@@ -7,7 +7,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    handleIncrementClick: () => dispatch({ type: "NEXT" }),
+    handleIncrementClick: () => {
+      dispatch({ type: "NEXT" });
+    },
     handleDecrementClick: () => dispatch({ type: "PREVIOUS" }),
   };
 };
@@ -15,12 +17,31 @@ const mapDispatchToProps = (dispatch) => {
 const GameController = connect(
   mapStateToProps,
   mapDispatchToProps
-)(({ handleIncrementClick, handleDecrementClick }) => {
+)(({ handleIncrementClick, handleDecrementClick, gameState }) => {
   return (
-    <div style={{ border: "2px solid blue", position: "absolute", zIndex: 10 }}>
-      <small>State of game:</small>
-      <button onClick={handleDecrementClick}>Previous Question</button>
-      <button onClick={handleIncrementClick}>Next Question</button>
+    <div
+      style={{
+        position: "absolute",
+        top: "20px",
+        right: "20px",
+        width: "300px",
+      }}
+    >
+      <div
+        style={{ border: "2px solid blue", position: "absolute", zIndex: 10 }}
+      >
+        <small>State of game:</small>
+        <p>has started: {gameState.hasStarted ? "True" : "False"}</p>
+        <p>has ended: {gameState.hasEnded ? "True" : "False"}</p>
+        <p>step: {gameState.step}</p>
+        <p>question: {gameState.data[gameState.step].text}</p>
+        <p>
+          question: {JSON.stringify(gameState.data[gameState.step].answers)}
+        </p>
+
+        <button onClick={handleDecrementClick}>Previous Question</button>
+        <button onClick={handleIncrementClick}>Next Question</button>
+      </div>
     </div>
   );
 });

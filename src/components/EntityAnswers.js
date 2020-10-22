@@ -34,7 +34,6 @@ const index = ({
           fontSize={14}
           inverted={true}
           textLines={splitTextIntoLines(text)}
-          textColor={"black"}
           x={0}
           y={0}
           outerRadius={radius}
