@@ -16,7 +16,7 @@ import Matter, {
 //eslint-disable-next-line no-unused-vars
 import MatterAttractors from "matter-attractors";
 
-Matter.use("matter-attractors");
+Matter.use(MatterAttractors);
 
 export default class EntityOrganismPhysics extends Component {
   constructor(props) {
@@ -26,16 +26,14 @@ export default class EntityOrganismPhysics extends Component {
   }
 
   componentDidMount() {
-    const engine = Engine.create({
-      //positionIterations: 20,
-    });
+    const engine = Engine.create();
 
     const renderer = Render.create({
       element: this.refEntityOrganismPhysics.current,
       engine: engine,
       options: {
-        width: 600,
-        height: 600,
+        width: 500,
+        height: 500,
         wireframes: true,
       },
     });
@@ -43,7 +41,7 @@ export default class EntityOrganismPhysics extends Component {
     const runner = Runner.create();
     Runner.run(runner, engine);
 
-    //Render.run(renderer);
+    Render.run(renderer);
 
     // create demo scene
     const world = engine.world;
@@ -63,8 +61,8 @@ export default class EntityOrganismPhysics extends Component {
           attractors: [
             function (bodyA, bodyB) {
               return {
-                x: (bodyA.position.x - bodyB.position.x) * 1e-10,
-                y: (bodyA.position.y - bodyB.position.y) * 1e-10,
+                x: (bodyA.position.x - bodyB.position.x) * 1e-5,
+                y: (bodyA.position.y - bodyB.position.y) * 1e-5,
               };
             },
           ],
@@ -122,28 +120,39 @@ export default class EntityOrganismPhysics extends Component {
     //     });
     // });
 
-    const mouse = Mouse.create(renderer.canvas),
-      mouseConstraint = MouseConstraint.create(engine, {
-        mouse: mouse,
-        constraint: {
-          stiffness: 0.2,
-          render: {
-            visible: false,
-          },
+    const mouse = Mouse.create(renderer.canvas);
+
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse: mouse,
+      constraint: {
+        stiffness: 0.2,
+        render: {
+          visible: true,
         },
-      });
+      },
+    });
 
     World.add(engine.world, mouseConstraint);
 
     Events.on(mouseConstraint, "mousedown", function (event) {});
     Events.on(runner, "afterUpdate", () => {
+      console.log("after update");
       const bodies = Composite.allBodies(engine.world);
-      console.log(bodies.map((el) => el.position));
-      Runner.stop(runner);
+
+      this.props.onChange(bodies);
+      //Runner.stop(runner);
     });
   }
 
   render() {
-    return <div style={{ position: "absolute", border: "2px solid red"}} ref={this.refEntityOrganismPhysics} />;
+    return (
+      <div
+        style={{
+          position: "absolute",
+          border: "2px solid red",
+        }}
+        ref={this.refEntityOrganismPhysics}
+      />
+    );
   }
 }
