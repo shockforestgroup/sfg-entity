@@ -12,6 +12,8 @@ import Matter, {
   Mouse,
   MouseConstraint,
 } from "matter-js";
+
+//eslint-disable-next-line no-unused-vars
 import MatterAttractors from "matter-attractors";
 
 Matter.use("matter-attractors");
@@ -20,6 +22,7 @@ export default class EntityOrganismPhysics extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.refEntityOrganismPhysics = React.createRef();
   }
 
   componentDidMount() {
@@ -28,7 +31,7 @@ export default class EntityOrganismPhysics extends Component {
     });
 
     const renderer = Render.create({
-      element: this.refs.entityOrganismPhysics,
+      element: this.refEntityOrganismPhysics.current,
       engine: engine,
       options: {
         width: 600,
@@ -141,6 +144,6 @@ export default class EntityOrganismPhysics extends Component {
   }
 
   render() {
-    return <div style={{ position: "absolute" }} ref="entityOrganismPhysics" />;
+    return <div style={{ position: "absolute", border: "2px solid red"}} ref={this.refEntityOrganismPhysics} />;
   }
 }

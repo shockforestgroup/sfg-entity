@@ -3,7 +3,6 @@ import { Provider } from "react-redux";
 import { createStore } from "redux";
 import Entity from "./components/Entity";
 import GameController from "./components/GameController";
-import EntityOrganismPhysics from "./components/EntityOrganismPhysics";
 
 import countReducer from "./redux/reducer.js";
 import { isDebugMode } from "./helpers/readEnvVar.js";
@@ -17,7 +16,6 @@ const App = () => (
   <Provider store={store}>
     {isDebugMode && <GameController />}
     <Entity />
-    {/* <EntityOrganismPhysics /> */}
   </Provider>
 );
 
