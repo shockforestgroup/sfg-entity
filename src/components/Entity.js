@@ -1,14 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Stage, Layer, Circle, Line, Group } from "react-konva";
-
-import getRandomInRange from "../helpers/getRandomInRange";
 import haveIntersection from "../helpers/haveIntersection";
 import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
 import EntityOrganism from "./EntityOrganism";
 import EntityStartPrompt from "./EntityStartPrompt";
 import SoundMaker from "../sounds/SoundMaker";
+import OrganismMaker from "../physics/OrganismsMaker";
 
 import { isDebugMode } from "../helpers/readEnvVar.js";
 import settings from "../settings";
@@ -30,25 +29,21 @@ function generateCircle() {
   };
 }
 
-function generateOrganisms(circle) {
-  const DISTANCE = circle.radius / 6;
-  return [...Array(10)].map((_, i) => ({
-    id: i.toString(),
-    x: getRandomInRange(-DISTANCE, DISTANCE),
-    y: getRandomInRange(-DISTANCE, DISTANCE),
-    rotation: Math.random() * 180,
-  }));
-}
-
 class Entity extends React.Component {
   constructor(props) {
     super(props);
     const circle = generateCircle();
+    this.entityOrganismsMaker = new OrganismMaker({
+      circle: circle,
+      onUpdate: (bodies) => {
+        this.setState({ organisms: bodies });
+      },
+    });
     this.state = {
       screenWidth: window.innerWidth,
       zoomFactor: 1, //0.6,
       bigCircle: circle,
-      organisms: generateOrganisms(circle),
+      organisms: [],
       traceLines: {},
       cursorType: "default",
       replyState: {
@@ -198,8 +193,17 @@ class Entity extends React.Component {
     this.updateDragState(true, id);
   };
 
-  handleDragMove = (e) => {
-    /* TODO: Update position of organism in state too, to keep in sync! */
+  updateOrganismPosition(organismId, newPosition) {
+    this.entityOrganismsMaker.setOrganismPosition(organismId, newPosition);
+  }
+
+  handleDragMove = (e, id) => {
+    const point = {
+      x: e.target.x(),
+      y: e.target.y(),
+    };
+    this.updateOrganismPosition(id, point);
+
     this.handleDragHover(e);
     this.updateDragLine(e);
   };
@@ -292,12 +296,13 @@ class Entity extends React.Component {
                 <EntityOrganism
                   key={o.id}
                   id={o.id}
-                  x={o.x}
-                  y={o.y}
+                  x={o.position.x}
+                  y={o.position.y}
+                  vertices={o.vertices}
                   rotation={o.isDropReady ? 45 : o.rotation}
                   isDragging={o.id === this.state.draggedOrganismId}
                   onDragStart={this.handleDragStart}
-                  onDragMove={this.handleDragMove}
+                  onDragMove={(e) => this.handleDragMove(e, o.id)}
                   onDragEnd={this.handleDragEnd}
                   onMouseEnter={() => this.setState({ cursorType: "grab" })}
                   onMouseLeave={() => this.setState({ cursorType: "default" })}
