@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Stage, Layer, Circle, Line, Group } from "react-konva";
-
 import haveIntersection from "../helpers/haveIntersection";
 import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
@@ -34,6 +33,7 @@ class Entity extends React.Component {
   constructor(props) {
     super(props);
     const circle = generateCircle();
+    console.log(circle);
     this.entityOrganismsMaker = new OrganismMaker({
       circle: circle,
       onUpdate: (bodies) => {
@@ -226,18 +226,6 @@ class Entity extends React.Component {
         duration: 0.8,
       });
     }
-  }
-
-  updateOrganisms(organismPhysicsBodies) {
-    console.log(organismPhysicsBodies);
-    this.setState((state) => ({
-      ...state,
-      organisms: state.organisms.map((o) => ({
-        ...o,
-        x: organismPhysicsBodies[1].position.x,
-        y: organismPhysicsBodies[1].position.y,
-      })),
-    }));
   }
 
   render() {

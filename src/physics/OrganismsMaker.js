@@ -1,16 +1,14 @@
-import Matter, {
-  Body,
-  Composite,
-  Engine,
-  Events,
-  Runner,
-  World,
-  Bodies,
-} from "matter-js";
+import Matter, { Body, Engine, Events, Runner, World, Bodies } from "matter-js";
 import MatterAttractors from "matter-attractors";
 import getRandomInRange from "../helpers/getRandomInRange";
 
 Matter.use(MatterAttractors);
+
+const SETTINGS = {
+  attractForce: 1e-6,
+  amountOrganisms: 10,
+  organismRadius: 30,
+};
 
 class EntityOrganisms {
   constructor(options) {
@@ -44,8 +42,8 @@ class EntityOrganisms {
         attractors: [
           function (bodyA, bodyB) {
             return {
-              x: (bodyA.position.x - bodyB.position.x) * 1e-8,
-              y: (bodyA.position.y - bodyB.position.y) * 1e-8,
+              x: (bodyA.position.x - bodyB.position.x) * SETTINGS.attractForce,
+              y: (bodyA.position.y - bodyB.position.y) * SETTINGS.attractForce,
             };
           },
         ],
@@ -55,11 +53,8 @@ class EntityOrganisms {
     World.add(world, attractiveBody);
 
     // add some bodies that to be attracted
-
-    const DISTANCE = this.circle.radius;
-
     let bodies = [];
-    for (let i = 0; i < 10; i += 1) {
+    for (let i = 0; i < SETTINGS.amountOrganisms; i += 1) {
       //const size = Common.random(10, 20);
 
       /*const body = Bodies.rectangle(
@@ -73,26 +68,22 @@ class EntityOrganisms {
           },
         }
       );*/
+
+      const DISTANCE = this.circle.radius / 2;
       const body = Bodies.circle(
         getRandomInRange(-DISTANCE, DISTANCE),
         getRandomInRange(-DISTANCE, DISTANCE),
-        10
+        SETTINGS.organismRadius
       );
       bodies.push(body);
       World.add(world, body);
     }
 
-    World.add(world, {});
-
     Events.on(runner, "afterUpdate", () => {
-      console.log("after update");
-      //const bodies = Composite.allBodies(engine.world);
       this.onUpdate(bodies);
-
-      /* Comment */
-      //Runner.stop(runner);
     });
-    return Composite.allBodies(engine.world);
+
+    return bodies;
   }
 }
 
