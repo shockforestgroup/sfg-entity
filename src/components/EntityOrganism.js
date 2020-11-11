@@ -1,16 +1,26 @@
 import React, { Component } from "react";
-import { Circle } from "react-konva";
+import { Shape } from "react-konva";
 
 export default class EntityOrganism extends Component {
   render() {
+    const normalizedVertices = this.props.vertices.map((v) => ({
+      x: v.x - this.props.x,
+      y: v.y - this.props.y,
+    }));
     return (
-      <Circle
+      <Shape
         id={this.props.id}
         x={this.props.x}
         y={this.props.y}
-        radius={10}
-        scaleX={this.props.isDragging ? 1 : 1}
-        scaleY={this.props.isDragging ? 1 : 1}
+        sceneFunc={(context, shape) => {
+          const startPoint = normalizedVertices[0];
+          context.beginPath();
+          context.moveTo(startPoint.x, startPoint.y);
+          normalizedVertices.forEach((v) => context.lineTo(v.x, v.y));
+          context.closePath();
+          // (!) Konva specific method, it is very important
+          context.fillStrokeShape(shape);
+        }}
         stroke="black"
         strokeWidth={1}
         fill="#fff"

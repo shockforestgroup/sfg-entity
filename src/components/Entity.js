@@ -33,7 +33,6 @@ class Entity extends React.Component {
   constructor(props) {
     super(props);
     const circle = generateCircle();
-    console.log(circle);
     this.entityOrganismsMaker = new OrganismMaker({
       circle: circle,
       onUpdate: (bodies) => {
@@ -199,10 +198,9 @@ class Entity extends React.Component {
   }
 
   handleDragMove = (e, id) => {
-    const center = this.calculateCellCenter(e);
     const point = {
-      x: center.x - this.state.bigCircle.x,
-      y: center.y - this.state.bigCircle.y,
+      x: e.target.x(),
+      y: e.target.y(),
     };
     this.updateOrganismPosition(id, point);
 
@@ -300,6 +298,7 @@ class Entity extends React.Component {
                   id={o.id}
                   x={o.position.x}
                   y={o.position.y}
+                  vertices={o.vertices}
                   rotation={o.isDropReady ? 45 : o.rotation}
                   isDragging={o.id === this.state.draggedOrganismId}
                   onDragStart={this.handleDragStart}

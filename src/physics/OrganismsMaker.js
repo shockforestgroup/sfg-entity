@@ -1,13 +1,21 @@
-import Matter, { Body, Engine, Events, Runner, World, Bodies } from "matter-js";
+import Matter, {
+  Body,
+  Engine,
+  Events,
+  Runner,
+  World,
+  Bodies,
+  Common,
+} from "matter-js";
 import MatterAttractors from "matter-attractors";
 import getRandomInRange from "../helpers/getRandomInRange";
 
 Matter.use(MatterAttractors);
 
 const SETTINGS = {
-  attractForce: 1e-6,
+  attractForce: 1e-8,
   amountOrganisms: 10,
-  organismRadius: 30,
+  organismRadius: 10,
 };
 
 class EntityOrganisms {
@@ -38,6 +46,7 @@ class EntityOrganisms {
       isStatic: true,
       // example of an attractor function that
       // returns a force vector that applies to bodyB
+
       plugin: {
         attractors: [
           function (bodyA, bodyB) {
@@ -55,9 +64,10 @@ class EntityOrganisms {
     // add some bodies that to be attracted
     let bodies = [];
     for (let i = 0; i < SETTINGS.amountOrganisms; i += 1) {
-      //const size = Common.random(10, 20);
+      const size = Common.random(10, 20);
+      const DISTANCE = this.circle.radius / 2;
 
-      /*const body = Bodies.rectangle(
+      const body = Bodies.rectangle(
         getRandomInRange(-DISTANCE, DISTANCE),
         getRandomInRange(-DISTANCE, DISTANCE),
         size,
@@ -67,20 +77,16 @@ class EntityOrganisms {
             radius: [size * 0.75, size * 0.3, size * 0.75, size * 0.3],
           },
         }
-      );*/
-
-      const DISTANCE = this.circle.radius / 2;
-      const body = Bodies.circle(
-        getRandomInRange(-DISTANCE, DISTANCE),
-        getRandomInRange(-DISTANCE, DISTANCE),
-        SETTINGS.organismRadius
       );
+
       bodies.push(body);
       World.add(world, body);
     }
 
     Events.on(runner, "afterUpdate", () => {
+      console.log("There was a physics update");
       this.onUpdate(bodies);
+      //Runner.stop(runner);
     });
 
     return bodies;
