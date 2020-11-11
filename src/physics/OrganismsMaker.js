@@ -7,9 +7,9 @@ import Matter, {
   World,
   Bodies,
 } from "matter-js";
+import MatterAttractors from "matter-attractors";
 import getRandomInRange from "../helpers/getRandomInRange";
 
-import MatterAttractors from "matter-attractors";
 Matter.use(MatterAttractors);
 
 class EntityOrganisms {

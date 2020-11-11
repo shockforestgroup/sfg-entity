@@ -8,7 +8,7 @@ import EntityAnswers from "./EntityAnswers";
 import EntityOrganism from "./EntityOrganism";
 import EntityStartPrompt from "./EntityStartPrompt";
 import SoundMaker from "../sounds/SoundMaker";
-import EntityOrganisms from "../physics/Organisms";
+import OrganismMaker from "../physics/OrganismsMaker";
 
 import { isDebugMode } from "../helpers/readEnvVar.js";
 import settings from "../settings";
@@ -34,7 +34,7 @@ class Entity extends React.Component {
   constructor(props) {
     super(props);
     const circle = generateCircle();
-    this.entityOrganismsMaker = new EntityOrganisms({
+    this.entityOrganismsMaker = new OrganismMaker({
       circle: circle,
       onUpdate: (bodies) => {
         this.setState({ organisms: bodies });
