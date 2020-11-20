@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Shape } from "react-konva";
+import { isDebugMode } from "../helpers/readEnvVar.js";
 
 export default class EntityOrganism extends Component {
   render() {
@@ -21,7 +22,7 @@ export default class EntityOrganism extends Component {
           // (!) Konva specific method, it is very important
           context.fillStrokeShape(shape);
         }}
-        stroke="black"
+        stroke={isDebugMode ? "black" : "white"}
         strokeWidth={1}
         draggable
         onDragStart={this.props.onDragStart}
