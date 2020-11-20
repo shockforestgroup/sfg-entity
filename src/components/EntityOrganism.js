@@ -23,6 +23,7 @@ export default class EntityOrganism extends Component {
           context.fillStrokeShape(shape);
         }}
         stroke={isDebugMode ? "black" : "white"}
+        fill={isDebugMode ? null : "black"}
         strokeWidth={1}
         draggable
         onDragStart={this.props.onDragStart}
