@@ -23,7 +23,6 @@ export default class EntityOrganism extends Component {
         }}
         stroke="black"
         strokeWidth={1}
-        fill="#fff"
         draggable
         onDragStart={this.props.onDragStart}
         onDragMove={this.props.onDragMove}
