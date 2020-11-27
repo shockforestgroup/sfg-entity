@@ -14,8 +14,8 @@ Matter.use(MatterAttractors);
 
 const SETTINGS = {
   attractForce: 1e-8,
-  amountOrganisms: 10,
-  organismRadius: 10,
+  amountOrganisms: 50,
+  organismRadius: 20,
 };
 
 class EntityOrganisms {
@@ -64,7 +64,7 @@ class EntityOrganisms {
     // add some bodies that to be attracted
     let bodies = [];
     for (let i = 0; i < SETTINGS.amountOrganisms; i += 1) {
-      const size = Common.random(10, 20);
+      const size = Common.random(10, SETTINGS.organismRadius);
       const DISTANCE = this.circle.radius / 2;
 
       const body = Bodies.rectangle(

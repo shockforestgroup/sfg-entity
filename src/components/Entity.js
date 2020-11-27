@@ -241,7 +241,6 @@ class Entity extends React.Component {
   }
 
   render() {
-    console.log("render");
     //this.scaleEntity();
     return (
       <>
