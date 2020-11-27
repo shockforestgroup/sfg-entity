@@ -262,7 +262,7 @@ class Entity extends React.Component {
               <Circle
                 x={0}
                 y={0}
-                radius={this.state.bigCircle.radius}
+                radius={this.state.bigCircle.radius - 2}
                 stroke="black"
                 fill={
                   isDebugMode
