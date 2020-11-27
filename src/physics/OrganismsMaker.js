@@ -42,7 +42,7 @@ class EntityOrganisms {
     world.gravity.scale = 0;
 
     // create a body with an attractor
-    const attractiveBody = Bodies.circle(0, 0, 10, {
+    const attractiveBody = Bodies.circle(0, 0, 0, {
       isStatic: true,
       // example of an attractor function that
       // returns a force vector that applies to bodyB
