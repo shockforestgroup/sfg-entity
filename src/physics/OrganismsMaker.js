@@ -84,7 +84,6 @@ class EntityOrganisms {
     }
 
     Events.on(runner, "afterUpdate", () => {
-      console.log("There was a physics update");
       this.onUpdate(bodies);
       //Runner.stop(runner);
     });
