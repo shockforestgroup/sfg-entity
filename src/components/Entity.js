@@ -51,6 +51,7 @@ class Entity extends React.Component {
         organismId: null,
         confirmed: false,
       },
+      answersUncovered: false,
     };
   }
 
@@ -155,6 +156,9 @@ class Entity extends React.Component {
       this.handleDropLandingStart(e);
       return;
     }
+    if (!this.state.answersUncovered) {
+      return;
+    }
 
     const organismId = e.target.id();
 
@@ -176,6 +180,7 @@ class Entity extends React.Component {
             ...this.state.replyState,
             confirmed: true,
           },
+          answersUncovered: false,
         });
         SoundMaker.playAnswerSound(answerCount);
         setTimeout(() => {
@@ -224,6 +229,7 @@ class Entity extends React.Component {
   };
 
   uncoverAnswers() {
+    this.setState({ answersUncovered: true });
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (!ref) return;
