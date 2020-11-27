@@ -202,8 +202,16 @@ class Entity extends React.Component {
       x: e.target.x(),
       y: e.target.y(),
     };
-    this.updateOrganismPosition(id, point);
 
+    const distance = Math.sqrt(
+      Math.pow(Math.abs(point.x), 2) + Math.pow(Math.abs(point.y), 2)
+    );
+
+    if (distance >= this.state.bigCircle.radius) {
+      return;
+    }
+
+    this.updateOrganismPosition(id, point);
     this.handleDragHover(e);
     this.updateDragLine(e);
   };
