@@ -4,7 +4,12 @@ export default {
       {
         text:
           "I'm here, like you, though I am dead and you're alive. \nWe both share an ability to remember. \nFrom when is your earliest memory?",
-        answers: ["when I was 1", "when I was 2", "when I was 3"],
+        answers: [
+          "when I was 1",
+          "when I was 2",
+          "when I was 3",
+          "when I was 5",
+        ],
       },
       {
         text:
