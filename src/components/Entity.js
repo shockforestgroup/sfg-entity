@@ -213,11 +213,12 @@ class Entity extends React.Component {
     }
   };
 
-  handleDragStart = (e) => {
+  handleDragStart = (e, organismId) => {
     SoundMaker.playPointerSound();
     const id = e.target.id();
     this.updateDragLine(e);
     this.updateDragState(true, id);
+    this.setState({ draggedOrganismId: organismId });
   };
 
   updateOrganismPosition(organismId, newPosition) {
@@ -243,11 +244,13 @@ class Entity extends React.Component {
     this.updateDragLine(e);
   };
 
-  handleDragEnd = (e) => {
+  handleDragEnd = (e, id) => {
     SoundMaker.stopPointerSound();
+    this.handleDragMove(e, id);
     this.handleDropLanding(e);
     this.updateDragLine(e);
     this.updateDragState(false);
+    this.setState({ draggedOrganismId: null });
   };
 
   fadeAwayQuestion() {
@@ -350,9 +353,9 @@ class Entity extends React.Component {
                   vertices={o.vertices}
                   rotation={o.isDropReady ? 45 : o.rotation}
                   isDragging={o.id === this.state.draggedOrganismId}
-                  onDragStart={this.handleDragStart}
+                  onDragStart={(e) => this.handleDragStart(e, o.id)}
                   onDragMove={(e) => this.handleDragMove(e, o.id)}
-                  onDragEnd={this.handleDragEnd}
+                  onDragEnd={(e) => this.handleDragEnd(e, o.id)}
                   onMouseEnter={() => this.setState({ cursorType: "grab" })}
                   onMouseLeave={() => this.setState({ cursorType: "default" })}
                 />
