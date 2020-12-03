@@ -97,18 +97,6 @@ class Entity extends React.Component {
     });
   }
 
-  scaleEntity() {
-    if (!this.entityLayerRef) return;
-    this.entityLayerRef.to({
-      scaleX: 0.5,
-      scaleY: 1,
-      duration: 1,
-      onFinish: () => {
-        this.setState({ zoomFactor: 1 });
-      },
-    });
-  }
-
   calculateCellCenter = (e) => {
     const rect = e.target.getClientRect();
     return {
@@ -126,15 +114,18 @@ class Entity extends React.Component {
   updateDragLine = (e) => {
     const id = e.target.id();
     const center = this.calculateCellCenter(e);
-    const point = { x: center.x, y: center.y };
+    const point = {
+      x: center.x,
+      y: center.y,
+    };
     const existingElementTraceLinePoints = this.state.traceLines[id]
       ? this.state.traceLines[id].points
       : [];
     /* append to existing trace line points for this element */
     const elementTraceLinePoints = [
       ...existingElementTraceLinePoints,
-      point.x - this.state.bigCircle.x,
-      point.y - this.state.bigCircle.y,
+      (point.x - this.state.bigCircle.x) / this.state.scaleFactor,
+      (point.y - this.state.bigCircle.y) / this.state.scaleFactor,
     ];
     this.setState({
       traceLines: {
