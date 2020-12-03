@@ -5,19 +5,30 @@ const surveyQuestions = surveyData.data.questions;
 const initialState = {
   data: surveyQuestions,
   step: 0,
-  hasStarted: false,
-  hasEnded: false,
+  gameState: "startscreen",
+  hasEndedWhen: null,
 };
 
 const countReducer = function (state = initialState, action) {
   switch (action.type) {
     case "START":
-      return { ...state, hasStarted: true };
+      return {
+        ...state,
+        hasEndedWhen: null,
+        gameState: "startscreen",
+      };
+    case "PLAY":
+      return {
+        ...state,
+        hasEndedWhen: null,
+        gameState: "playing",
+      };
     case "NEXT":
       if (state.step >= state.data.length - 1) {
         return {
           ...state,
-          hasEnded: true,
+          hasEndedWhen: new Date(),
+          gameState: "afterendidle",
         };
       }
       return {

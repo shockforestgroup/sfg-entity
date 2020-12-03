@@ -56,11 +56,33 @@ class Entity extends React.Component {
   }
 
   answerRefs = {};
+  questionRef = null;
   startTriggerRef = null;
   entityLayerRef = null;
+  timer = null;
 
   componentDidMount() {
     window.addEventListener("resize", () => this.handleResize());
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.gameState !== prevProps.gameState) {
+      if (this.props.gameState !== "afterendidle") {
+        return;
+      }
+      this.timer = setTimeout(() => {
+        this.clearGameState();
+      }, settings.WAIT_UNTIL_GAME_RESTART);
+    }
+  }
+
+  clearGameState() {
+    this.setState({ traceLines: {} });
+    this.props.restartGame();
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.timer);
   }
 
   handleResize() {
@@ -144,7 +166,7 @@ class Entity extends React.Component {
     ) {
       SoundMaker.playBackgroundSound();
       setTimeout(() => {
-        this.props.startGame();
+        this.props.playGame();
         this.scaleEntity();
       }, settings.WAIT_AFTER_ANSWER_SELECT);
       return;
@@ -152,7 +174,7 @@ class Entity extends React.Component {
   };
 
   handleDropLanding = (e) => {
-    if (!this.props.hasStarted) {
+    if (this.props.gameState === "startscreen") {
       this.handleDropLandingStart(e);
       return;
     }
@@ -228,6 +250,17 @@ class Entity extends React.Component {
     this.updateDragState(false);
   };
 
+  fadeAwayQuestion() {
+    const ref = this.questionRef;
+    if (!ref) {
+      return;
+    }
+    ref.to({
+      opacity: 0,
+      duration: 0.8,
+    });
+  }
+
   uncoverAnswers() {
     this.setState({ answersUncovered: true });
     for (let id in this.answerRefs) {
@@ -270,25 +303,16 @@ class Entity extends React.Component {
                 }
               />
 
-              {this.props.hasStarted && (
+              {this.props.gameState === "playing" && (
                 <EntityQuestion
                   radius={this.state.bigCircle.radius}
                   text={this.props.questionText}
+                  ref={this.questionRef}
                   onAnimationHasEnded={() => this.uncoverAnswers()}
                 />
               )}
 
-              {this.props.hasStarted ? (
-                <EntityAnswers
-                  options={this.props.answers}
-                  radius={this.state.bigCircle.radius}
-                  currentActivated={this.state.answerActivated}
-                  currentTriggered={this.state.answerTriggered}
-                  createRef={(answerId, ref) => {
-                    this.answerRefs[answerId] = ref;
-                  }}
-                />
-              ) : (
+              {this.props.gameState === "startscreen" && (
                 <Group
                   y={-200}
                   scale={{
@@ -303,6 +327,18 @@ class Entity extends React.Component {
                     }}
                   />
                 </Group>
+              )}
+
+              {this.props.gameState === "playing" && (
+                <EntityAnswers
+                  options={this.props.answers}
+                  radius={this.state.bigCircle.radius}
+                  currentActivated={this.state.answerActivated}
+                  currentTriggered={this.state.answerTriggered}
+                  createRef={(answerId, ref) => {
+                    this.answerRefs[answerId] = ref;
+                  }}
+                />
               )}
 
               {this.state.organisms.map((o) => (
@@ -335,6 +371,16 @@ class Entity extends React.Component {
                   opacity={1}
                 />
               ))}
+
+              {this.props.gameState === "afterendidle" && (
+                <Circle
+                  x={0}
+                  y={0}
+                  radius={this.state.bigCircle.radius / 10}
+                  stroke="black"
+                  fill="black"
+                />
+              )}
             </Group>
           </Layer>
         </Stage>
@@ -345,8 +391,8 @@ class Entity extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    hasStarted: state.hasStarted,
-    hasEnded: state.hasEnded,
+    gameState: state.gameState,
+    hasEndedWhen: state.hasEndedWhen,
     questionText: state.data[state.step].text,
     answers: state.data[state.step].answers.map((answerText, i) => ({
       id: i,
@@ -356,7 +402,8 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    startGame: () => dispatch({ type: "START" }),
+    playGame: () => dispatch({ type: "PLAY" }),
+    restartGame: () => dispatch({ type: "START" }),
     goToNextQuestion: () => dispatch({ type: "NEXT" }),
   };
 };
