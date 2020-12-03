@@ -33,6 +33,7 @@ class Entity extends React.Component {
   constructor(props) {
     super(props);
     const circle = generateCircle();
+    this.originalCircle = circle;
     this.entityOrganismsMaker = new OrganismMaker({
       circle: circle,
       onUpdate: (bodies) => {
@@ -41,7 +42,7 @@ class Entity extends React.Component {
     });
     this.state = {
       screenWidth: window.innerWidth,
-      zoomFactor: 1, //0.6,
+      scaleFactor: 1,
       bigCircle: circle,
       organisms: [],
       traceLines: {},
@@ -60,6 +61,7 @@ class Entity extends React.Component {
   startTriggerRef = null;
   entityLayerRef = null;
   timer = null;
+  originalCircle = null;
 
   componentDidMount() {
     window.addEventListener("resize", () => this.handleResize());
@@ -86,14 +88,19 @@ class Entity extends React.Component {
   }
 
   handleResize() {
-    const circle = generateCircle();
-    this.setState({ screenWidth: window.innerWidth, bigCircle: circle });
+    const newCircle = generateCircle();
+    const scaleFactor = newCircle.radius / this.originalCircle.radius;
+    this.setState({
+      screenWidth: window.innerWidth,
+      bigCircle: newCircle,
+      scaleFactor: scaleFactor,
+    });
   }
 
   scaleEntity() {
     if (!this.entityLayerRef) return;
     this.entityLayerRef.to({
-      scaleX: 1,
+      scaleX: 0.5,
       scaleY: 1,
       duration: 1,
       onFinish: () => {
@@ -167,7 +174,6 @@ class Entity extends React.Component {
       SoundMaker.playBackgroundSound();
       setTimeout(() => {
         this.props.playGame();
-        this.scaleEntity();
       }, settings.WAIT_AFTER_ANSWER_SELECT);
       return;
     }
@@ -277,7 +283,6 @@ class Entity extends React.Component {
   }
 
   render() {
-    //this.scaleEntity();
     return (
       <>
         <Stage
@@ -289,7 +294,6 @@ class Entity extends React.Component {
             <Group
               x={this.state.bigCircle.x}
               y={this.state.bigCircle.y}
-              scale={{ x: this.state.zoomFactor, y: this.state.zoomFactor }}
               ref={(node) => {
                 this.entityLayerRef = node;
               }}
@@ -316,13 +320,7 @@ class Entity extends React.Component {
               )}
 
               {this.props.gameState === "startscreen" && (
-                <Group
-                  y={-200}
-                  scale={{
-                    x: 1 / this.state.zoomFactor,
-                    y: 1 / this.state.zoomFactor,
-                  }}
-                >
+                <Group y={-200}>
                   <EntityStartPrompt
                     radius={this.state.bigCircle.radius}
                     createRef={(ref) => {
@@ -344,25 +342,12 @@ class Entity extends React.Component {
                 />
               )}
 
-              {this.state.organisms.map((o) => (
-                <EntityOrganism
-                  key={o.id}
-                  id={o.id}
-                  x={o.position.x}
-                  y={o.position.y}
-                  vertices={o.vertices}
-                  rotation={o.isDropReady ? 45 : o.rotation}
-                  isDragging={o.id === this.state.draggedOrganismId}
-                  onDragStart={(e) => this.handleDragStart(e, o.id)}
-                  onDragMove={(e) => this.handleDragMove(e, o.id)}
-                  onDragEnd={(e) => this.handleDragEnd(e, o.id)}
-                  onMouseEnter={() => this.setState({ cursorType: "grab" })}
-                  onMouseLeave={() => this.setState({ cursorType: "default" })}
-                />
-              ))}
-
               {Object.keys(this.state.traceLines).map((key) => (
                 <Line
+                  scale={{
+                    x: this.state.scaleFactor,
+                    y: this.state.scaleFactor,
+                  }}
                   key={key}
                   id={key}
                   points={this.state.traceLines[key].points}
@@ -384,6 +369,24 @@ class Entity extends React.Component {
                   fill="black"
                 />
               )}
+            </Group>
+            <Group x={this.state.bigCircle.x} y={this.state.bigCircle.y}>
+              {this.state.organisms.map((o) => (
+                <EntityOrganism
+                  key={o.id}
+                  id={o.id}
+                  x={o.position.x}
+                  y={o.position.y}
+                  vertices={o.vertices}
+                  rotation={o.isDropReady ? 45 : o.rotation}
+                  isDragging={o.id === this.state.draggedOrganismId}
+                  onDragStart={(e) => this.handleDragStart(e, o.id)}
+                  onDragMove={(e) => this.handleDragMove(e, o.id)}
+                  onDragEnd={(e) => this.handleDragEnd(e, o.id)}
+                  onMouseEnter={() => this.setState({ cursorType: "grab" })}
+                  onMouseLeave={() => this.setState({ cursorType: "default" })}
+                />
+              ))}
             </Group>
           </Layer>
         </Stage>
