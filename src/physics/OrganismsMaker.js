@@ -14,7 +14,7 @@ Matter.use(MatterAttractors);
 
 const SETTINGS = {
   attractForce: 1e-8,
-  amountOrganisms: 1,
+  amountOrganisms: 50,
   organismRadius: 20,
 };
 
