@@ -30,7 +30,7 @@ export default class EntityOrganism extends Component {
         }}
         stroke={isDebugMode ? "black" : "white"}
         strokeWidth={1}
-        draggable
+        //draggable
         onDragStart={this.props.onDragStart}
         onDragMove={this.props.onDragMove}
         onDragEnd={this.props.onDragEnd}

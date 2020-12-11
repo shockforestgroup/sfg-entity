@@ -29,6 +29,13 @@ function generateCircle() {
   };
 }
 
+function calculateOffset() {
+  return {
+    x: -window.innerWidth / 2,
+    y: -window.innerHeight / 2,
+  };
+}
+
 class Entity extends React.Component {
   constructor(props) {
     super(props);
@@ -36,6 +43,7 @@ class Entity extends React.Component {
     this.originalCircle = circle;
     this.entityOrganismsMaker = new OrganismMaker({
       circle: circle,
+      offset: calculateOffset(),
     });
     this.state = {
       screenWidth: window.innerWidth,
@@ -113,6 +121,7 @@ class Entity extends React.Component {
       bigCircle: newCircle,
       scaleFactor: scaleFactor,
     });
+    this.entityOrganismsMaker.updateMouseOffset(calculateOffset());
   }
 
   calculateCellCenter = (e) => {
@@ -236,12 +245,13 @@ class Entity extends React.Component {
     this.setState({ draggedOrganismId: organismId });
   };
 
-  updateOrganismPosition(organismId, newPosition) {
+  /*updateOrganismPosition(organismId, newPosition) {
+    return;
     this.entityOrganismsMaker.requestNewOrganismPosition(
       organismId,
       newPosition
     );
-  }
+  }*/
 
   handleDragMove = (e, id) => {
     const point = {
@@ -257,7 +267,7 @@ class Entity extends React.Component {
       return;
     }
 
-    this.updateOrganismPosition(id, point);
+    //this.updateOrganismPosition(id, point);
     this.handleDragHover(e);
     this.updateDragLine(e);
   };
