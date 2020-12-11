@@ -36,6 +36,20 @@ function calculateOffset() {
   };
 }
 
+function approximateRectAroundMouse(mouse) {
+  const size = 20;
+  const mousePos = {
+    x: mouse.mouseupPosition.x,
+    y: mouse.mouseupPosition.y,
+  };
+  return {
+    x: mousePos.x - mouse.offset.x - size / 2,
+    y: mousePos.y - mouse.offset.y - size / 2,
+    height: size,
+    width: size,
+  };
+}
+
 class Entity extends React.Component {
   constructor(props) {
     super(props);
@@ -44,6 +58,9 @@ class Entity extends React.Component {
     this.entityOrganismsMaker = new OrganismMaker({
       circle: circle,
       offset: calculateOffset(),
+      onDragStart: this.handleDragStart,
+      onDragEnd: this.handleDragEnd,
+      onDragMove: this.handleDragMove,
     });
     this.state = {
       screenWidth: window.innerWidth,
@@ -52,11 +69,6 @@ class Entity extends React.Component {
       organisms: [],
       traceLines: {},
       cursorType: "default",
-      replyState: {
-        answerId: null,
-        organismId: null,
-        confirmed: false,
-      },
       answersUncovered: false,
     };
   }
@@ -124,13 +136,11 @@ class Entity extends React.Component {
     this.entityOrganismsMaker.updateMouseOffset(calculateOffset());
   }
 
-  calculateCellCenter = (e) => {
-    const rect = e.target.getClientRect();
-    return {
-      x: rect.x + rect.width / 2,
-      y: rect.y + rect.height / 2,
-    };
-  };
+  handleUserAnswer(answerNumber) {
+    SoundMaker.playAnswerSound(answerNumber);
+    this.setState({ answersUncovered: false });
+    setTimeout(this.props.goToNextQuestion, settings.WAIT_AFTER_ANSWER_SELECT);
+  }
 
   updateDragState(isDragging) {
     this.setState({
@@ -138,12 +148,10 @@ class Entity extends React.Component {
     });
   }
 
-  updateDragLine = (e) => {
-    const id = e.target.id();
-    const center = this.calculateCellCenter(e);
+  updateDragLine = (id, rawPoint) => {
     const point = {
-      x: center.x,
-      y: center.y,
+      x: rawPoint.x - calculateOffset().x,
+      y: rawPoint.y - calculateOffset().y,
     };
     const existingElementTraceLinePoints = this.state.traceLines[id]
       ? this.state.traceLines[id].points
@@ -162,7 +170,7 @@ class Entity extends React.Component {
     });
   };
 
-  handleDragHover = (e) => {
+  /*handleDragHover = (e) => {
     const organismId = e.target.id();
     let hoveredAnswerId = null;
     for (let id in this.answerRefs) {
@@ -180,15 +188,11 @@ class Entity extends React.Component {
         organismId: organismId,
       },
     });
-  };
+  };*/
 
   handleDropLandingStart = (e) => {
-    if (
-      haveIntersection(
-        e.target.getClientRect(),
-        this.startTriggerRef.getClientRect()
-      )
-    ) {
+    const mouseRect = approximateRectAroundMouse(e.mouse);
+    if (haveIntersection(mouseRect, this.startTriggerRef.getClientRect())) {
       SoundMaker.playBackgroundSound();
       setTimeout(() => {
         this.props.playGame();
@@ -197,22 +201,16 @@ class Entity extends React.Component {
     }
   };
 
-  handleDropLanding = (e) => {
-    if (this.props.gameState === "startscreen") {
-      this.handleDropLandingStart(e);
-      return;
-    }
-    if (!this.state.answersUncovered) {
-      return;
-    }
-
-    const organismId = e.target.id();
-
-    let answerCount = 0;
+  handleDropLanding = (e, body) => {
+    if (!this.state.answersUncovered) return;
+    console.log("handleDroplanding");
+    const organismId = body.id;
+    const mouseRect = approximateRectAroundMouse(e.mouse);
+    let answerNumber = 0;
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (!ref) return;
-      if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
+      if (haveIntersection(mouseRect, ref.getClientRect())) {
         this.setState({
           traceLines: {
             ...this.state.traceLines,
@@ -221,64 +219,46 @@ class Entity extends React.Component {
               confirmed: true,
             },
           },
-
-          replyState: {
-            ...this.state.replyState,
-            confirmed: true,
-          },
-          answersUncovered: false,
         });
-        SoundMaker.playAnswerSound(answerCount);
-        setTimeout(() => {
-          this.props.goToNextQuestion();
-        }, settings.WAIT_AFTER_ANSWER_SELECT);
+        this.handleUserAnswer(answerNumber);
       }
-      answerCount++;
+      answerNumber++;
     }
   };
 
-  handleDragStart = (e, organismId) => {
+  handleDragStart = (e) => {
     SoundMaker.playPointerSound();
-    const id = e.target.id();
-    this.updateDragLine(e);
-    this.updateDragState(true, id);
-    this.setState({ draggedOrganismId: organismId });
-  };
-
-  /*updateOrganismPosition(organismId, newPosition) {
-    return;
-    this.entityOrganismsMaker.requestNewOrganismPosition(
-      organismId,
-      newPosition
-    );
-  }*/
-
-  handleDragMove = (e, id) => {
+    const id = e.body.id;
     const point = {
-      x: e.target.x(),
-      y: e.target.y(),
+      x: e.body.position.x,
+      y: e.body.position.y,
     };
-
-    const distance = Math.sqrt(
-      Math.pow(Math.abs(point.x), 2) + Math.pow(Math.abs(point.y), 2)
-    );
-
-    if (distance >= this.state.bigCircle.radius) {
-      return;
-    }
-
-    //this.updateOrganismPosition(id, point);
-    this.handleDragHover(e);
-    this.updateDragLine(e);
+    this.updateDragLine(id, point);
+    this.updateDragState(true);
   };
 
-  handleDragEnd = (e, id) => {
+  handleDragMove = (e, body) => {
+    const id = body.id;
+    const point = {
+      x: body.position.x,
+      y: body.position.y,
+    };
+    //this.handleDragHover(e);
+    this.updateDragLine(id, point);
+  };
+
+  handleDragEnd = (e, body) => {
     SoundMaker.stopPointerSound();
-    this.handleDragMove(e, id);
-    this.handleDropLanding(e);
-    this.updateDragLine(e);
+    const id = e.body.id;
+    const point = {
+      x: e.body.position.x,
+      y: e.body.position.y,
+    };
+    this.props.gameState === "startscreen"
+      ? this.handleDropLandingStart(e)
+      : this.handleDropLanding(e, body);
+    this.updateDragLine(id, point);
     this.updateDragState(false);
-    this.setState({ draggedOrganismId: null });
   };
 
   fadeAwayQuestion() {
@@ -400,10 +380,6 @@ class Entity extends React.Component {
                   x={o.position.x}
                   y={o.position.y}
                   vertices={o.vertices}
-                  isDragging={o.id === this.state.draggedOrganismId}
-                  onDragStart={(e) => this.handleDragStart(e, o.id)}
-                  onDragMove={(e) => this.handleDragMove(e, o.id)}
-                  onDragEnd={(e) => this.handleDragEnd(e, o.id)}
                   onMouseEnter={() => this.setState({ cursorType: "grab" })}
                   onMouseLeave={() => this.setState({ cursorType: "default" })}
                 />

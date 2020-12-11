@@ -26,6 +26,10 @@ class EntityOrganisms {
     this.organisms = [];
     this.engine = null;
     this.mouse = null;
+    this.draggedBody = null;
+    this.onDragStart = options.onDragStart || (() => {});
+    this.onDragEnd = options.onDragEnd || (() => {});
+    this.onDragMove = options.onDragMove || (() => {});
     this._initPhysics();
   }
 
@@ -101,7 +105,23 @@ class EntityOrganisms {
 
     /*************** Events....!!! ********************/
     Events.on(mouseConstraint, "startdrag", (event) => {
-      console.log("startdrag", event);
+      console.log("Drag start!");
+      this.draggedBody = event.body;
+      this.onDragStart(event);
+    });
+
+    Events.on(mouseConstraint, "enddrag", (event) => {
+      console.log("Drag end!");
+      console.log(event);
+      this.onDragEnd(event, this.draggedBody);
+      this.draggedBody = null;
+    });
+
+    Events.on(mouseConstraint, "mousemove", (event) => {
+      /* if we're actually dragging */
+      if (this.draggedBody) {
+        this.onDragMove(event, this.draggedBody);
+      }
     });
 
     /*Events.on(runner, "afterUpdate", () => {

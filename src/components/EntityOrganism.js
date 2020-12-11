@@ -3,12 +3,6 @@ import { Shape } from "react-konva";
 import { isDebugMode } from "../helpers/readEnvVar.js";
 
 export default class EntityOrganism extends Component {
-  shouldComponentUpdate() {
-    if (this.props.isDragging) {
-      return false;
-    }
-    return true;
-  }
   render() {
     const normalizedVertices = this.props.vertices.map((v) => ({
       x: v.x - this.props.x,
@@ -30,10 +24,6 @@ export default class EntityOrganism extends Component {
         }}
         stroke={isDebugMode ? "black" : "white"}
         strokeWidth={1}
-        //draggable
-        onDragStart={this.props.onDragStart}
-        onDragMove={this.props.onDragMove}
-        onDragEnd={this.props.onDragEnd}
         onMouseEnter={this.props.onMouseEnter}
         onMouseLeave={this.props.onMouseLeave}
       />
