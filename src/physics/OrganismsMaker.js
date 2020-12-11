@@ -30,6 +30,7 @@ class EntityOrganisms {
     this.onDragStart = options.onDragStart || (() => {});
     this.onDragEnd = options.onDragEnd || (() => {});
     this.onDragMove = options.onDragMove || (() => {});
+    this.constraint = null;
     this._initPhysics();
   }
 
@@ -86,12 +87,23 @@ class EntityOrganisms {
           chamfer: {
             radius: [size * 0.75, size * 0.3, size * 0.75, size * 0.3],
           },
+          angle: Common.random(0, 6),
         }
       );
 
       bodies.push(body);
       World.add(world, body);
     }
+
+    this.constraint = Matter.Constraint.create({
+      length: this.circle.radius,
+      stiffness: 1e-10,
+      pointA: { x: 0, y: 0 },
+      //initialize with a random body, doesnt matter for now as long as stiffness isnt tangible
+      bodyB: bodies[0],
+    });
+
+    World.add(world, this.constraint);
 
     /*************** Mouse Constraint ********************/
     const mouse = Mouse.create(document.body);
@@ -103,7 +115,7 @@ class EntityOrganisms {
 
     World.add(world, mouseConstraint);
 
-    /*************** Events....!!! ********************/
+    /*************** Mouse Events....!!! ********************/
     Events.on(mouseConstraint, "startdrag", (event) => {
       console.log("Drag start!");
       this.draggedBody = event.body;
@@ -115,12 +127,31 @@ class EntityOrganisms {
       console.log(event);
       this.onDragEnd(event, this.draggedBody);
       this.draggedBody = null;
+      this.constraint.stiffness = 1e-10;
     });
 
     Events.on(mouseConstraint, "mousemove", (event) => {
       /* if we're actually dragging */
       if (this.draggedBody) {
         this.onDragMove(event, this.draggedBody);
+      }
+    });
+
+    /*************** Behavior of organisms when they come close to the border ********************/
+
+    Events.on(engine, "beforeUpdate", (event) => {
+      if (!this.draggedBody) return;
+      const distanceFromCenter = Math.hypot(
+        this.draggedBody.position.x,
+        this.draggedBody.position.y
+      );
+
+      if (distanceFromCenter > this.circle.radius) {
+        this.constraint.bodyB = this.draggedBody;
+        this.constraint.stiffness = 1;
+        this.constraint.length = this.circle.radius;
+      } else {
+        this.constraint.stiffness = 1e-10;
       }
     });
 
