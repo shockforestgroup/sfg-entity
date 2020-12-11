@@ -29,7 +29,12 @@ class EntityOrganisms {
     const body = this.organisms.find((o) => o.id === id);
     if (body) {
       Body.setPosition(body, newPosition);
+      console.log("1 - set position");
     }
+  }
+
+  getBodies() {
+    return this.organisms;
   }
 
   _initPhysics() {

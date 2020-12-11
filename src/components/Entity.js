@@ -36,9 +36,6 @@ class Entity extends React.Component {
     this.originalCircle = circle;
     this.entityOrganismsMaker = new OrganismMaker({
       circle: circle,
-      onUpdate: (bodies) => {
-        this.setState({ organisms: bodies });
-      },
     });
     this.state = {
       screenWidth: window.innerWidth,
@@ -62,9 +59,11 @@ class Entity extends React.Component {
   entityLayerRef = null;
   timer = null;
   originalCircle = null;
+  animationFrameId = null;
 
   componentDidMount() {
     window.addEventListener("resize", () => this.handleResize());
+    this.startAnimation();
   }
 
   componentDidUpdate(prevProps) {
@@ -77,6 +76,25 @@ class Entity extends React.Component {
       }, settings.WAIT_UNTIL_GAME_RESTART);
     }
   }
+
+  startAnimation() {
+    if (!this.animationFrameId) {
+      this.animationFrameId = window.requestAnimationFrame(
+        this.animateOrganisms
+      );
+    }
+  }
+
+  stopAnimation() {
+    window.cancelAnimationFrame(this.animationFrameId);
+  }
+
+  animateOrganisms = () => {
+    //talk to Organism Maker to get new coordinates
+    const bodies = this.entityOrganismsMaker.getBodies();
+    this.setState({ organisms: bodies });
+    this.animationFrameId = window.requestAnimationFrame(this.animateOrganisms);
+  };
 
   clearGameState() {
     this.setState({ traceLines: {} });
@@ -369,7 +387,6 @@ class Entity extends React.Component {
                   x={o.position.x}
                   y={o.position.y}
                   vertices={o.vertices}
-                  rotation={o.isDropReady ? 45 : o.rotation}
                   isDragging={o.id === this.state.draggedOrganismId}
                   onDragStart={(e) => this.handleDragStart(e, o.id)}
                   onDragMove={(e) => this.handleDragMove(e, o.id)}
