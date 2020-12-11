@@ -237,7 +237,10 @@ class Entity extends React.Component {
   };
 
   updateOrganismPosition(organismId, newPosition) {
-    this.entityOrganismsMaker.setOrganismPosition(organismId, newPosition);
+    this.entityOrganismsMaker.requestNewOrganismPosition(
+      organismId,
+      newPosition
+    );
   }
 
   handleDragMove = (e, id) => {

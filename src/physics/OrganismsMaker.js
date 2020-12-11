@@ -21,15 +21,16 @@ const SETTINGS = {
 class EntityOrganisms {
   constructor(options) {
     this.circle = options.circle;
-    this.organisms = this._initPhysics();
-    this.onUpdate = options.onUpdate || (() => {});
+    this.organisms = [];
+    this.engine = null;
+    this._initPhysics();
   }
 
-  setOrganismPosition(id, newPosition) {
+  requestNewOrganismPosition(id, newPosition) {
     const body = this.organisms.find((o) => o.id === id);
     if (body) {
       Body.setPosition(body, newPosition);
-      console.log("1 - set position");
+      Engine.update(this.engine, 1);
     }
   }
 
@@ -88,12 +89,13 @@ class EntityOrganisms {
       World.add(world, body);
     }
 
-    Events.on(runner, "afterUpdate", () => {
+    /*Events.on(runner, "afterUpdate", () => {
       this.onUpdate(bodies);
       //Runner.stop(runner);
-    });
+    });*/
 
-    return bodies;
+    this.organisms = bodies;
+    this.engine = engine;
   }
 }
 
