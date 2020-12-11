@@ -111,7 +111,7 @@ class Entity extends React.Component {
 
   animateOrganisms = () => {
     //talk to Organism Maker to get new coordinates
-    const bodies = this.entityOrganismsMaker.getBodies();
+    const bodies = this.entityOrganismsMaker.getOrganisms();
     this.setState({ organisms: bodies });
     this.animationFrameId = window.requestAnimationFrame(this.animateOrganisms);
   };
@@ -197,6 +197,7 @@ class Entity extends React.Component {
       setTimeout(() => {
         this.props.playGame();
       }, settings.WAIT_AFTER_ANSWER_SELECT);
+      this.entityOrganismsMaker.killOrganism(e.body.id);
       return;
     }
   };
@@ -220,6 +221,7 @@ class Entity extends React.Component {
             },
           },
         });
+        this.entityOrganismsMaker.killOrganism(body.id);
         this.handleUserAnswer(answerNumber);
       }
       answerNumber++;

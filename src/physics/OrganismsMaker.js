@@ -19,6 +19,22 @@ const SETTINGS = {
   organismRadius: 20,
 };
 
+function createBody(radius, pos) {
+  const DISTANCE = radius / 2;
+  const position = pos || {
+    x: getRandomInRange(-DISTANCE, DISTANCE),
+    y: getRandomInRange(-DISTANCE, DISTANCE),
+  };
+  const size = Common.random(10, SETTINGS.organismRadius);
+
+  return Bodies.rectangle(position.x, position.y, size, size, {
+    chamfer: {
+      radius: [size * 0.75, size * 0.3, size * 0.75, size * 0.3],
+    },
+    angle: Common.random(0, 6),
+  });
+}
+
 class EntityOrganisms {
   constructor(options) {
     this.circle = options.circle;
@@ -26,6 +42,7 @@ class EntityOrganisms {
     this.organisms = [];
     this.engine = null;
     this.mouse = null;
+    this.world = null;
     this.draggedBody = null;
     this.onDragStart = options.onDragStart || (() => {});
     this.onDragEnd = options.onDragEnd || (() => {});
@@ -34,7 +51,23 @@ class EntityOrganisms {
     this._initPhysics();
   }
 
-  getBodies() {
+  spawnNewOrganism() {
+    const body = createBody(this.circle.radius, { x: 0, y: 0 });
+    World.add(this.world, body);
+    this.organisms.push(body);
+  }
+
+  killOrganism(id) {
+    const body = this.organisms.find((el) => el.id === id);
+    if (!body) {
+      return;
+    }
+    World.remove(this.world, body);
+    const index = this.organisms.findIndex((el) => el.id === id);
+    this.organisms.splice(index, 1);
+  }
+
+  getOrganisms() {
     return this.organisms;
   }
 
@@ -75,24 +108,9 @@ class EntityOrganisms {
     // add some bodies that to be attracted
     let bodies = [];
     for (let i = 0; i < SETTINGS.amountOrganisms; i += 1) {
-      const size = Common.random(10, SETTINGS.organismRadius);
-      const DISTANCE = this.circle.radius / 2;
-
-      const body = Bodies.rectangle(
-        getRandomInRange(-DISTANCE, DISTANCE),
-        getRandomInRange(-DISTANCE, DISTANCE),
-        size,
-        size,
-        {
-          chamfer: {
-            radius: [size * 0.75, size * 0.3, size * 0.75, size * 0.3],
-          },
-          angle: Common.random(0, 6),
-        }
-      );
-
-      bodies.push(body);
+      const body = createBody(this.circle.radius);
       World.add(world, body);
+      bodies.push(body);
     }
 
     this.constraint = Matter.Constraint.create({
@@ -160,9 +178,13 @@ class EntityOrganisms {
       //Runner.stop(runner);
     });*/
 
-    this.organisms = bodies;
     this.engine = engine;
     this.mouse = mouse;
+    this.organisms = bodies;
+    this.world = world;
+
+    /* Spawn new organisms every second */
+    setInterval(() => this.spawnNewOrganism(), 1000);
   }
 }
 
