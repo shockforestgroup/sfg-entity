@@ -52,12 +52,14 @@ class EntityOrganisms {
   }
 
   spawnNewOrganism() {
+    console.log("spawn");
     const body = createBody(this.circle.radius, { x: 0, y: 0 });
     World.add(this.world, body);
     this.organisms.push(body);
   }
 
   killOrganism(id) {
+    console.log("kill");
     const body = this.organisms.find((el) => el.id === id);
     if (!body) {
       return;
@@ -182,9 +184,6 @@ class EntityOrganisms {
     this.mouse = mouse;
     this.organisms = bodies;
     this.world = world;
-
-    /* Spawn new organisms every second */
-    setInterval(() => this.spawnNewOrganism(), 1000);
   }
 }
 
