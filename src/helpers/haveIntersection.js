@@ -1,5 +1,4 @@
 function haveIntersection(r1, r2) {
-  console.log(r1, r2);
   if (
     !r1.x ||
     !r2.x ||

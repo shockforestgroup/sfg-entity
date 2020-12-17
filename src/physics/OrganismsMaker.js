@@ -52,14 +52,12 @@ class EntityOrganisms {
   }
 
   spawnNewOrganism() {
-    console.log("spawn");
     const body = createBody(this.circle.radius, { x: 0, y: 0 });
     World.add(this.world, body);
     this.organisms.push(body);
   }
 
   killOrganism(id) {
-    console.log("kill");
     const body = this.organisms.find((el) => el.id === id);
     if (!body) {
       return;
@@ -137,14 +135,11 @@ class EntityOrganisms {
 
     /*************** Mouse Events....!!! ********************/
     Events.on(mouseConstraint, "startdrag", (event) => {
-      console.log("Drag start!");
       this.draggedBody = event.body;
       this.onDragStart(event);
     });
 
     Events.on(mouseConstraint, "enddrag", (event) => {
-      console.log("Drag end!");
-      console.log(event);
       this.onDragEnd(event, this.draggedBody);
       this.draggedBody = null;
       this.constraint.stiffness = 1e-10;

@@ -219,7 +219,6 @@ class Entity extends React.Component {
 
   handleDropLanding = (e, body) => {
     if (!this.state.answersUncovered) return;
-    console.log("handleDroplanding");
     const organismId = body.id;
     const mouseRect = approximateRectAroundMouse(e.mouse);
     let answerNumber = 0;
