@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Stage, Layer, Circle, Line, Group } from "react-konva";
+import FontFaceObserver from "fontfaceobserver";
 import haveIntersection from "../helpers/haveIntersection";
 import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
@@ -63,6 +64,7 @@ class Entity extends React.Component {
       onDragMove: this.handleDragMove,
     });
     this.state = {
+      fontsLoaded: false,
       screenWidth: window.innerWidth,
       scaleFactor: 1,
       bigCircle: circle,
@@ -83,6 +85,7 @@ class Entity extends React.Component {
 
   componentDidMount() {
     window.addEventListener("resize", () => this.handleResize());
+    this.checkFontLoading();
     this.startAnimation();
   }
 
@@ -95,6 +98,12 @@ class Entity extends React.Component {
         this.clearGameState();
       }, settings.WAIT_UNTIL_GAME_RESTART);
     }
+  }
+
+  checkFontLoading() {
+    new FontFaceObserver("Inconsolata").load().then(() => {
+      this.setState({ fontsLoaded: true });
+    });
   }
 
   startAnimation() {
@@ -191,6 +200,9 @@ class Entity extends React.Component {
   };*/
 
   handleDropLandingStart = (e) => {
+    if (!this.startTriggerRef) {
+      return;
+    }
     const mouseRect = approximateRectAroundMouse(e.mouse);
     if (haveIntersection(mouseRect, this.startTriggerRef.getClientRect())) {
       SoundMaker.playBackgroundSound();
@@ -321,7 +333,7 @@ class Entity extends React.Component {
                 }
               />
 
-              {this.props.gameState === "playing" && (
+              {this.props.gameState === "playing" && this.state.fontsLoaded && (
                 <EntityQuestion
                   radius={this.state.bigCircle.radius}
                   text={this.props.questionText}
@@ -330,18 +342,19 @@ class Entity extends React.Component {
                 />
               )}
 
-              {this.props.gameState === "startscreen" && (
-                <Group y={-200}>
-                  <EntityStartPrompt
-                    radius={this.state.bigCircle.radius}
-                    createRef={(ref) => {
-                      this.startTriggerRef = ref;
-                    }}
-                  />
-                </Group>
-              )}
+              {this.props.gameState === "startscreen" &&
+                this.state.fontsLoaded && (
+                  <Group y={-100}>
+                    <EntityStartPrompt
+                      radius={this.state.bigCircle.radius}
+                      createRef={(ref) => {
+                        this.startTriggerRef = ref;
+                      }}
+                    />
+                  </Group>
+                )}
 
-              {this.props.gameState === "playing" && (
+              {this.props.gameState === "playing" && this.state.fontsLoaded && (
                 <EntityAnswers
                   options={this.props.answers}
                   radius={this.state.bigCircle.radius}
