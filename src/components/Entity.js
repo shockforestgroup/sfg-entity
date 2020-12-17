@@ -198,7 +198,9 @@ class Entity extends React.Component {
         this.props.playGame();
       }, settings.WAIT_AFTER_ANSWER_SELECT);
       this.entityOrganismsMaker.killOrganism(e.body.id);
-      this.entityOrganismsMaker.spawnNewOrganism();
+      setTimeout(() => {
+        this.entityOrganismsMaker.spawnNewOrganism();
+      }, 1000);
       return;
     }
   };
@@ -223,7 +225,10 @@ class Entity extends React.Component {
           },
         });
         this.entityOrganismsMaker.killOrganism(body.id);
-        this.entityOrganismsMaker.spawnNewOrganism();
+        setTimeout(() => {
+          this.entityOrganismsMaker.spawnNewOrganism();
+        }, 1000);
+
         this.handleUserAnswer(answerNumber);
       }
       answerNumber++;
