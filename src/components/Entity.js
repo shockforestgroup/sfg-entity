@@ -72,6 +72,7 @@ class Entity extends React.Component {
       traceLines: {},
       cursorType: "default",
       answersUncovered: false,
+      draggedOrganismId: null,
     };
   }
 
@@ -255,6 +256,7 @@ class Entity extends React.Component {
     };
     this.updateDragLine(id, point);
     this.updateDragState(true);
+    this.setState({ draggedOrganismId: id });
   };
 
   handleDragMove = (e, body) => {
@@ -279,6 +281,7 @@ class Entity extends React.Component {
       : this.handleDropLanding(e, body);
     this.updateDragLine(id, point);
     this.updateDragState(false);
+    this.setState({ draggedOrganismId: null });
   };
 
   fadeAwayQuestion() {
@@ -401,6 +404,7 @@ class Entity extends React.Component {
                   x={o.position.x}
                   y={o.position.y}
                   vertices={o.vertices}
+                  hasHalo={o.id === this.state.draggedOrganismId}
                   onMouseEnter={() => this.setState({ cursorType: "grab" })}
                   onMouseLeave={() => this.setState({ cursorType: "default" })}
                 />
