@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Shape, Circle } from "react-konva";
 import { isDebugMode } from "../helpers/readEnvVar.js";
 
-const HALO_RADIUS = 70;
+const HALO_RADIUS = 100;
 
 export default class EntityOrganism extends Component {
   render() {
@@ -24,9 +24,11 @@ export default class EntityOrganism extends Component {
             fillRadialGradientEndRadius={HALO_RADIUS}
             fillRadialGradientColorStops={[
               0,
+              "rgba(255,255,255,0.1)",
+              0.2,
+              "rgba(255,255,255,0.6)",
+              0.3,
               "rgba(255,255,255,0.5)",
-              0.7,
-              "rgba(150,255,0,0.1)",
               1,
               "rgba(0,0,0,0)",
             ]}

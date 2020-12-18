@@ -16,7 +16,7 @@ Matter.use(MatterAttractors);
 const SETTINGS = {
   attractForce: 1e-8,
   amountOrganisms: 50,
-  organismRadius: 20,
+  organismRadius: 30,
 };
 
 function createBody(radius, pos) {
