@@ -7,6 +7,8 @@ import GameController from "./components/GameController";
 import countReducer from "./redux/reducer.js";
 import { isDebugMode } from "./helpers/readEnvVar.js";
 
+import settings from "./settings";
+
 let store = createStore(
   countReducer,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
@@ -15,7 +17,9 @@ let store = createStore(
 const App = () => (
   <Provider store={store}>
     {isDebugMode && <GameController />}
-    <Entity />
+    <div style={{backgroundColor: settings.CANVAS_BG_COLOR}}>
+      <Entity />
+    </div>
   </Provider>
 );
 
