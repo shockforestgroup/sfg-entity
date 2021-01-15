@@ -14,7 +14,7 @@ import getRandomInRange from "../helpers/getRandomInRange";
 Matter.use(MatterAttractors);
 
 const SETTINGS = {
-  attractForce: 1e-8,
+  attractForce: .5e-6,
   amountOrganisms: 50,
   organismRadius: 30,
 };
@@ -32,6 +32,7 @@ function createBody(radius, pos) {
       radius: [size * 0.75, size * 0.3, size * 0.75, size * 0.3],
     },
     angle: Common.random(0, 6),
+    frictionAir: .5,
   });
 }
 
