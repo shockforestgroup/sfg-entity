@@ -14,9 +14,10 @@ import getRandomInRange from "../helpers/getRandomInRange";
 Matter.use(MatterAttractors);
 
 const SETTINGS = {
-  attractForce: 1e-8,
-  amountOrganisms: 50,
-  organismRadius: 30,
+  attractForce: .5e-6,
+  amountOrganisms: 100,
+  maxOrganismRadius: 10,
+  minOrganismRadius: 30
 };
 
 function createBody(radius, pos) {
@@ -25,13 +26,15 @@ function createBody(radius, pos) {
     x: getRandomInRange(-DISTANCE, DISTANCE),
     y: getRandomInRange(-DISTANCE, DISTANCE),
   };
-  const size = Common.random(10, SETTINGS.organismRadius);
+  const size = Common.random(SETTINGS.minOrganismRadius, SETTINGS.maxOrganismRadius);
 
   return Bodies.rectangle(position.x, position.y, size, size, {
     chamfer: {
       radius: [size * 0.75, size * 0.3, size * 0.75, size * 0.3],
     },
     angle: Common.random(0, 6),
+    frictionAir: .5,
+    density: .001,
   });
 }
 
