@@ -56,13 +56,7 @@ class Entity extends React.Component {
     super(props);
     const circle = generateCircle();
     this.originalCircle = circle;
-    this.entityOrganismsMaker = new OrganismMaker({
-      circle: circle,
-      offset: calculateOffset(),
-      onDragStart: this.handleDragStart,
-      onDragEnd: this.handleDragEnd,
-      onDragMove: this.handleDragMove,
-    });
+    this.entityOrganismsMaker = null;
     this.state = {
       fontsLoaded: false,
       screenWidth: window.innerWidth,
@@ -76,6 +70,7 @@ class Entity extends React.Component {
     };
   }
 
+  canvasElementRef = null;
   answerRefs = {};
   questionRef = null;
   startTriggerRef = null;
@@ -87,7 +82,19 @@ class Entity extends React.Component {
   componentDidMount() {
     window.addEventListener("resize", () => this.handleResize());
     this.checkFontLoading();
+    this.initOrganismRendering();
     this.startAnimation();
+  }
+
+  initOrganismRendering() {
+    this.entityOrganismsMaker = new OrganismMaker({
+      element: this.canvasElementRef,
+      circle: this.state.bigCircle,
+      offset: { x: 0, y: 0 },
+      onDragStart: this.handleDragStart,
+      onDragEnd: this.handleDragEnd,
+      onDragMove: this.handleDragMove,
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -310,6 +317,12 @@ class Entity extends React.Component {
   render() {
     return (
       <>
+        <canvas
+          style={{ position: "absolute", zIndex: 1 }}
+          ref={(node) => {
+            this.canvasElementRef = node;
+          }}
+        ></canvas>
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
@@ -396,20 +409,6 @@ class Entity extends React.Component {
                   fill="black"
                 />
               )}
-            </Group>
-            <Group x={this.state.bigCircle.x} y={this.state.bigCircle.y}>
-              {this.state.organisms.map((o) => (
-                <EntityOrganism
-                  key={o.id}
-                  id={o.id}
-                  x={o.position.x}
-                  y={o.position.y}
-                  vertices={o.vertices}
-                  hasHalo={o.id === this.state.draggedOrganismId}
-                  onMouseEnter={() => this.setState({ cursorType: "grab" })}
-                  onMouseLeave={() => this.setState({ cursorType: "default" })}
-                />
-              ))}
             </Group>
           </Layer>
         </Stage>

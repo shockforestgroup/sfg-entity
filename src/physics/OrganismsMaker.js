@@ -6,6 +6,7 @@ import Matter, {
   Mouse,
   MouseConstraint,
   Runner,
+  Render,
   World,
 } from "matter-js";
 import MatterAttractors from "matter-attractors";
@@ -14,32 +15,39 @@ import getRandomInRange from "../helpers/getRandomInRange";
 Matter.use(MatterAttractors);
 
 const SETTINGS = {
-  attractForce: .5e-6,
+  attractForce: 0.5e-6,
   amountOrganisms: 100,
   maxOrganismRadius: 10,
-  minOrganismRadius: 30
+  minOrganismRadius: 30,
 };
 
-function createBody(radius, pos) {
+function createBody(center, radius, pos) {
   const DISTANCE = radius / 2;
   const position = pos || {
-    x: getRandomInRange(-DISTANCE, DISTANCE),
-    y: getRandomInRange(-DISTANCE, DISTANCE),
+    x: center.x + getRandomInRange(-DISTANCE, DISTANCE),
+    y: center.y + getRandomInRange(-DISTANCE, DISTANCE),
   };
-  const size = Common.random(SETTINGS.minOrganismRadius, SETTINGS.maxOrganismRadius);
+  const size = Common.random(
+    SETTINGS.minOrganismRadius,
+    SETTINGS.maxOrganismRadius
+  );
 
   return Bodies.rectangle(position.x, position.y, size, size, {
     chamfer: {
       radius: [size * 0.75, size * 0.3, size * 0.75, size * 0.3],
     },
+    render: { fillStyle: "black", strokeStyle: "white", lineWidth: "2" },
     angle: Common.random(0, 6),
-    frictionAir: .5,
-    density: .001,
+    frictionAir: 0.5,
+    density: 0.001,
   });
 }
 
 class EntityOrganisms {
   constructor(options) {
+    this.element = options.element;
+    this.canvasWidth = window.innerWidth;
+    this.canvasHeight = window.innerHeight;
     this.circle = options.circle;
     this.offset = options.offset || { x: 0, y: 0 };
     this.organisms = [];
@@ -52,10 +60,21 @@ class EntityOrganisms {
     this.onDragMove = options.onDragMove || (() => {});
     this.constraint = null;
     this._initPhysics();
+    window.addEventListener("resize", () => this.handleResize());
+  }
+
+  handleResize() {
+    this.canvasWidth = window.innerWidth;
+    this.canvasHeight = window.innerHeight;
+    this.element.width = this.canvasWidth;
+    this.element.height = this.canvasHeight;
+    this.attractiveBody.position.x = this.canvasWidth / 2;
+    this.attractiveBody.position.y = this.canvasHeight / 2;
   }
 
   spawnNewOrganism() {
-    const body = createBody(this.circle.radius, { x: 0, y: 0 });
+    const center = { x: this.canvasWidth / 2, y: this.canvasHeight / 2 };
+    const body = createBody(null, null, center);
     World.add(this.world, body);
     this.organisms.push(body);
   }
@@ -80,38 +99,59 @@ class EntityOrganisms {
   }
 
   _initPhysics() {
+    console.log("this.element", this.element);
     const engine = Engine.create();
     const runner = Runner.create();
+    const renderer = Render.create({
+      canvas: this.element,
+      engine: engine,
+      options: {
+        background: "transparent",
+        width: this.canvasWidth,
+        height: this.canvasHeight,
+        //wireframeBackground: "transparent",
+        wireframes: false,
+      },
+    });
     Runner.run(runner, engine);
+    Render.run(renderer);
 
     // create demo scene
     const world = engine.world;
     world.gravity.scale = 0;
 
     // create a body with an attractor
-    const attractiveBody = Bodies.circle(0, 0, 0, {
-      isStatic: true,
-      // example of an attractor function that
-      // returns a force vector that applies to bodyB
+    this.attractiveBody = Bodies.circle(
+      this.canvasWidth / 2,
+      this.canvasHeight / 2,
+      0,
+      {
+        isStatic: true,
+        // example of an attractor function that
+        // returns a force vector that applies to bodyB
 
-      plugin: {
-        attractors: [
-          function (bodyA, bodyB) {
-            return {
-              x: (bodyA.position.x - bodyB.position.x) * SETTINGS.attractForce,
-              y: (bodyA.position.y - bodyB.position.y) * SETTINGS.attractForce,
-            };
-          },
-        ],
-      },
-    });
+        plugin: {
+          attractors: [
+            function (bodyA, bodyB) {
+              return {
+                x:
+                  (bodyA.position.x - bodyB.position.x) * SETTINGS.attractForce,
+                y:
+                  (bodyA.position.y - bodyB.position.y) * SETTINGS.attractForce,
+              };
+            },
+          ],
+        },
+      }
+    );
 
-    World.add(world, attractiveBody);
+    World.add(world, this.attractiveBody);
 
     // add some bodies that to be attracted
     let bodies = [];
+    const center = { x: this.canvasWidth / 2, y: this.canvasHeight / 2 };
     for (let i = 0; i < SETTINGS.amountOrganisms; i += 1) {
-      const body = createBody(this.circle.radius);
+      const body = createBody(center, this.circle.radius);
       World.add(world, body);
       bodies.push(body);
     }
@@ -128,7 +168,7 @@ class EntityOrganisms {
 
     /*************** Mouse Constraint ********************/
     const mouse = Mouse.create(document.body);
-    Mouse.setOffset(mouse, this.offset);
+    //Mouse.setOffset(mouse, this.offset);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse: mouse,
       constraint: { stiffness: 0.8, render: { visible: false } },
@@ -157,7 +197,7 @@ class EntityOrganisms {
 
     /*************** Behavior of organisms when they come close to the border ********************/
 
-    Events.on(engine, "beforeUpdate", (event) => {
+    /* Events.on(engine, "beforeUpdate", (event) => {
       if (!this.draggedBody) return;
       const distanceFromCenter = Math.hypot(
         this.draggedBody.position.x,
@@ -171,11 +211,6 @@ class EntityOrganisms {
       } else {
         this.constraint.stiffness = 1e-10;
       }
-    });
-
-    /*Events.on(runner, "afterUpdate", () => {
-      this.onUpdate(bodies);
-      //Runner.stop(runner);
     });*/
 
     this.engine = engine;
