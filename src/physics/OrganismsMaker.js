@@ -183,6 +183,9 @@ class EntityOrganisms {
       pointA: { x: 0, y: 0 },
       //initialize with a random body, doesnt matter for now as long as stiffness isnt tangible
       bodyB: bodies[0],
+      render: {
+        visible: false,
+      }
     });
 
     World.add(world, this.constraint);
