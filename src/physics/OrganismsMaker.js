@@ -197,7 +197,7 @@ class EntityOrganisms {
     //Mouse.setOffset(mouse, this.offset);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse: mouse,
-      constraint: { stiffness: 0.8, render: { visible: true } },
+      constraint: { stiffness: 0.8, render: { visible: false } },
     });
 
     World.add(world, mouseConstraint);
