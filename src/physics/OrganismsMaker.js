@@ -93,11 +93,6 @@ class EntityOrganisms {
     return this.organisms;
   }
 
-  updateMouseOffset(offset) {
-    this.offset = offset;
-    Mouse.setOffset(this.mouse, offset);
-  }
-
   _initPhysics() {
     console.log("this.element", this.element);
     const engine = Engine.create();

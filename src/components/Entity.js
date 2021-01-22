@@ -149,7 +149,6 @@ class Entity extends React.Component {
       bigCircle: newCircle,
       scaleFactor: scaleFactor,
     });
-    this.entityOrganismsMaker.updateMouseOffset(calculateOffset());
   }
 
   handleUserAnswer(answerNumber) {
