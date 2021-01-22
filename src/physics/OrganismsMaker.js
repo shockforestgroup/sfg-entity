@@ -1,4 +1,5 @@
 import Matter, {
+  Body,
   Bodies,
   Common,
   Engine,
@@ -93,6 +94,29 @@ class EntityOrganisms {
     return this.organisms;
   }
 
+  updateGradient() {
+    if (!this.draggedBody) return;
+    const posX = this.draggedBody.position.x;
+    const posY = this.draggedBody.position.y;
+    const grad = this.renderer.context.createRadialGradient(
+      posX,
+      posY,
+      0,
+      posX,
+      posY,
+      20
+    );
+    grad.addColorStop(0, "rgba(0,0,0,0.0");
+    grad.addColorStop(0.9, "rgba(255,255,255,100");
+    grad.addColorStop(1, "rgba(255,255,255,0");
+    this.draggedBody.render.fillStyle = grad;
+  }
+
+  resetGradient() {
+    if (!this.draggedBody) return;
+    this.draggedBody.render.fillStyle = "black";
+  }
+
   _initPhysics() {
     console.log("this.element", this.element);
     const engine = Engine.create();
@@ -108,6 +132,7 @@ class EntityOrganisms {
         wireframes: false,
       },
     });
+    this.renderer = renderer;
     Runner.run(runner, engine);
     Render.run(renderer);
 
@@ -174,10 +199,13 @@ class EntityOrganisms {
     /*************** Mouse Events....!!! ********************/
     Events.on(mouseConstraint, "startdrag", (event) => {
       this.draggedBody = event.body;
+      Body.scale(this.draggedBody, 2, 2);
       this.onDragStart(event);
     });
 
     Events.on(mouseConstraint, "enddrag", (event) => {
+      this.resetGradient();
+      Body.scale(this.draggedBody, 0.5, 0.5);
       this.onDragEnd(event, this.draggedBody);
       this.draggedBody = null;
       this.constraint.stiffness = 1e-10;
@@ -186,6 +214,7 @@ class EntityOrganisms {
     Events.on(mouseConstraint, "mousemove", (event) => {
       /* if we're actually dragging */
       if (this.draggedBody) {
+        this.updateGradient();
         this.onDragMove(event, this.draggedBody);
       }
     });
