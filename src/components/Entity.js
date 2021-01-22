@@ -10,6 +10,7 @@ import SoundMaker from "../sounds/SoundMaker";
 import OrganismMaker from "../physics/OrganismsMaker";
 
 import { isDebugMode } from "../helpers/readEnvVar.js";
+import isTouchDevice from "../helpers/isTouchDevice";
 import settings from "../settings";
 
 const ENTITY_MARGIN = 0;
@@ -93,6 +94,7 @@ class Entity extends React.Component {
       onDragStart: this.handleDragStart,
       onDragEnd: this.handleDragEnd,
       onDragMove: this.handleDragMove,
+      isTouch: isTouchDevice(),
     });
   }
 

@@ -60,6 +60,7 @@ class EntityOrganisms {
     this.onDragEnd = options.onDragEnd || (() => {});
     this.onDragMove = options.onDragMove || (() => {});
     this.constraint = null;
+    this.isTouch = options.isTouch || false;
     this._initPhysics();
     window.addEventListener("resize", () => this.handleResize());
   }
@@ -199,13 +200,18 @@ class EntityOrganisms {
     /*************** Mouse Events....!!! ********************/
     Events.on(mouseConstraint, "startdrag", (event) => {
       this.draggedBody = event.body;
-      Body.scale(this.draggedBody, 2, 2);
+      if (this.isTouch) {
+        Body.scale(this.draggedBody, 2, 2);
+      }
       this.onDragStart(event);
     });
 
     Events.on(mouseConstraint, "enddrag", (event) => {
-      this.resetGradient();
-      Body.scale(this.draggedBody, 0.5, 0.5);
+      if (this.isTouch) {
+        Body.scale(this.draggedBody, 0.5, 0.5);
+        this.resetGradient();
+      }
+
       this.onDragEnd(event, this.draggedBody);
       this.draggedBody = null;
       this.constraint.stiffness = 1e-10;
@@ -214,7 +220,7 @@ class EntityOrganisms {
     Events.on(mouseConstraint, "mousemove", (event) => {
       /* if we're actually dragging */
       if (this.draggedBody) {
-        this.updateGradient();
+        this.isTouch && this.updateGradient();
         this.onDragMove(event, this.draggedBody);
       }
     });
