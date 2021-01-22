@@ -5,12 +5,12 @@ import FontFaceObserver from "fontfaceobserver";
 import haveIntersection from "../helpers/haveIntersection";
 import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
-import EntityOrganism from "./EntityOrganism";
 import EntityStartPrompt from "./EntityStartPrompt";
 import SoundMaker from "../sounds/SoundMaker";
 import OrganismMaker from "../physics/OrganismsMaker";
 
 import { isDebugMode } from "../helpers/readEnvVar.js";
+import isTouchDevice from "../helpers/isTouchDevice";
 import settings from "../settings";
 
 const ENTITY_MARGIN = 0;
@@ -32,8 +32,8 @@ function generateCircle() {
 
 function calculateOffset() {
   return {
-    x: -window.innerWidth / 2,
-    y: -window.innerHeight / 2,
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
   };
 }
 
@@ -56,13 +56,7 @@ class Entity extends React.Component {
     super(props);
     const circle = generateCircle();
     this.originalCircle = circle;
-    this.entityOrganismsMaker = new OrganismMaker({
-      circle: circle,
-      offset: calculateOffset(),
-      onDragStart: this.handleDragStart,
-      onDragEnd: this.handleDragEnd,
-      onDragMove: this.handleDragMove,
-    });
+    this.entityOrganismsMaker = null;
     this.state = {
       fontsLoaded: false,
       screenWidth: window.innerWidth,
@@ -76,6 +70,7 @@ class Entity extends React.Component {
     };
   }
 
+  canvasElementRef = null;
   answerRefs = {};
   questionRef = null;
   startTriggerRef = null;
@@ -87,7 +82,20 @@ class Entity extends React.Component {
   componentDidMount() {
     window.addEventListener("resize", () => this.handleResize());
     this.checkFontLoading();
+    this.initOrganismRendering();
     this.startAnimation();
+  }
+
+  initOrganismRendering() {
+    this.entityOrganismsMaker = new OrganismMaker({
+      element: this.canvasElementRef,
+      circle: this.state.bigCircle,
+      offset: { x: 0, y: 0 },
+      onDragStart: this.handleDragStart,
+      onDragEnd: this.handleDragEnd,
+      onDragMove: this.handleDragMove,
+      isTouch: isTouchDevice(),
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -143,7 +151,6 @@ class Entity extends React.Component {
       bigCircle: newCircle,
       scaleFactor: scaleFactor,
     });
-    this.entityOrganismsMaker.updateMouseOffset(calculateOffset());
   }
 
   handleUserAnswer(answerNumber) {
@@ -160,8 +167,8 @@ class Entity extends React.Component {
 
   updateDragLine = (id, rawPoint) => {
     const point = {
-      x: rawPoint.x - calculateOffset().x,
-      y: rawPoint.y - calculateOffset().y,
+      x: (rawPoint.x - calculateOffset().x) / this.state.scaleFactor,
+      y: (rawPoint.y - calculateOffset().y) / this.state.scaleFactor,
     };
     const existingElementTraceLinePoints = this.state.traceLines[id]
       ? this.state.traceLines[id].points
@@ -169,8 +176,8 @@ class Entity extends React.Component {
     /* append to existing trace line points for this element */
     const elementTraceLinePoints = [
       ...existingElementTraceLinePoints,
-      (point.x - this.state.bigCircle.x) / this.state.scaleFactor,
-      (point.y - this.state.bigCircle.y) / this.state.scaleFactor,
+      point.x,
+      point.y,
     ];
     this.setState({
       traceLines: {
@@ -310,6 +317,12 @@ class Entity extends React.Component {
   render() {
     return (
       <>
+        <canvas
+          style={{ position: "absolute", zIndex: 1 }}
+          ref={(node) => {
+            this.canvasElementRef = node;
+          }}
+        ></canvas>
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
@@ -396,20 +409,6 @@ class Entity extends React.Component {
                   fill="black"
                 />
               )}
-            </Group>
-            <Group x={this.state.bigCircle.x} y={this.state.bigCircle.y}>
-              {this.state.organisms.map((o) => (
-                <EntityOrganism
-                  key={o.id}
-                  id={o.id}
-                  x={o.position.x}
-                  y={o.position.y}
-                  vertices={o.vertices}
-                  hasHalo={o.id === this.state.draggedOrganismId}
-                  onMouseEnter={() => this.setState({ cursorType: "grab" })}
-                  onMouseLeave={() => this.setState({ cursorType: "default" })}
-                />
-              ))}
             </Group>
           </Layer>
         </Stage>
