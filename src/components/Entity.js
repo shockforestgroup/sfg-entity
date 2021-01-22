@@ -5,7 +5,6 @@ import FontFaceObserver from "fontfaceobserver";
 import haveIntersection from "../helpers/haveIntersection";
 import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
-import EntityOrganism from "./EntityOrganism";
 import EntityStartPrompt from "./EntityStartPrompt";
 import SoundMaker from "../sounds/SoundMaker";
 import OrganismMaker from "../physics/OrganismsMaker";
@@ -32,8 +31,8 @@ function generateCircle() {
 
 function calculateOffset() {
   return {
-    x: -window.innerWidth / 2,
-    y: -window.innerHeight / 2,
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
   };
 }
 
@@ -167,8 +166,8 @@ class Entity extends React.Component {
 
   updateDragLine = (id, rawPoint) => {
     const point = {
-      x: rawPoint.x - calculateOffset().x,
-      y: rawPoint.y - calculateOffset().y,
+      x: (rawPoint.x - calculateOffset().x) / this.state.scaleFactor,
+      y: (rawPoint.y - calculateOffset().y) / this.state.scaleFactor,
     };
     const existingElementTraceLinePoints = this.state.traceLines[id]
       ? this.state.traceLines[id].points
@@ -176,8 +175,8 @@ class Entity extends React.Component {
     /* append to existing trace line points for this element */
     const elementTraceLinePoints = [
       ...existingElementTraceLinePoints,
-      (point.x - this.state.bigCircle.x) / this.state.scaleFactor,
-      (point.y - this.state.bigCircle.y) / this.state.scaleFactor,
+      point.x,
+      point.y,
     ];
     this.setState({
       traceLines: {
