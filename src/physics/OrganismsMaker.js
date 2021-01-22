@@ -17,7 +17,7 @@ Matter.use(MatterAttractors);
 
 const SETTINGS = {
   attractForce: 0.5e-6,
-  amountOrganisms: 100,
+  amountOrganisms: 60,
   maxOrganismRadius: 10,
   minOrganismRadius: 30,
 };
@@ -35,7 +35,9 @@ function createBody(center, radius, pos) {
 
   return Bodies.rectangle(position.x, position.y, size, size, {
     chamfer: {
-      radius: [size * 0.75, size * 0.3, size * 0.75, size * 0.3],
+      radius: [Math.round(size * 0.75), Math.round(size * 0.3), Math.round(size * 0.75), Math.round(size * 0.3)],
+      //keep this at 3 (for organism sizes smaller than 30), since other values cause issues with performance and selfintersection. Auto quality setting also has these issues.
+      quality: 3, 
     },
     render: { fillStyle: "black", strokeStyle: "white", lineWidth: "2" },
     angle: Common.random(0, 6),
@@ -192,7 +194,7 @@ class EntityOrganisms {
     //Mouse.setOffset(mouse, this.offset);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse: mouse,
-      constraint: { stiffness: 0.8, render: { visible: false } },
+      constraint: { stiffness: 0.8, render: { visible: true } },
     });
 
     World.add(world, mouseConstraint);
