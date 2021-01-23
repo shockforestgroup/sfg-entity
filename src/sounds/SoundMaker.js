@@ -11,7 +11,7 @@ class SoundMaker {
   constructor() {
     this.pointerSoundAudio = new Audio(soundPointer);
     this.pointerSoundAudio.loop = true;
-    this.pointerSoundAudio.volume = 0.4;
+    this.pointerSoundAudio.volume = 0.15;
     this.backgroundSound = new Audio(soundBackground);
     this.backgroundSound.loop = true;
     this.answerSounds = answerSounds.map((sound) => new Audio(sound));
