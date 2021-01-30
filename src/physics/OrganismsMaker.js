@@ -52,6 +52,7 @@ class EntityOrganisms {
     this.canvasWidth = window.innerWidth;
     this.canvasHeight = window.innerHeight;
     this.circle = options.circle;
+    this.center = { x: this.canvasWidth / 2, y: this.canvasHeight / 2 };
     this.offset = options.offset || { x: 0, y: 0 };
     this.organisms = [];
     this.engine = null;
@@ -74,6 +75,8 @@ class EntityOrganisms {
     this.element.height = this.canvasHeight;
     this.attractiveBody.position.x = this.canvasWidth / 2;
     this.attractiveBody.position.y = this.canvasHeight / 2;
+    this.center = { x: this.canvasWidth / 2, y: this.canvasHeight / 2 };
+    this.constraint.pointA = this.center;
   }
 
   spawnNewOrganism() {
@@ -172,9 +175,8 @@ class EntityOrganisms {
 
     // add some bodies that to be attracted
     let bodies = [];
-    const center = { x: this.canvasWidth / 2, y: this.canvasHeight / 2 };
     for (let i = 0; i < SETTINGS.amountOrganisms; i += 1) {
-      const body = createBody(center, this.circle.radius);
+      const body = createBody(this.center, this.circle.radius);
       World.add(world, body);
       bodies.push(body);
     }
@@ -182,7 +184,7 @@ class EntityOrganisms {
     this.constraint = Matter.Constraint.create({
       length: this.circle.radius,
       stiffness: 1e-10,
-      pointA: center,
+      pointA: this.center,
       //initialize with a random body, doesnt matter for now as long as stiffness isnt tangible
       bodyB: bodies[0],
       render: {
@@ -205,6 +207,7 @@ class EntityOrganisms {
     /*************** Mouse Events....!!! ********************/
     Events.on(mouseConstraint, "startdrag", (event) => {
       this.draggedBody = event.body;
+      this.constraint.bodyB = this.draggedBody;
       if (this.isTouch) {
         Body.scale(this.draggedBody, 2, 2);
       }
@@ -234,17 +237,18 @@ class EntityOrganisms {
 
     Events.on(engine, "beforeUpdate", (event) => {
       if (!this.draggedBody) return;
-      const distanceFromCenter = Math.hypot(
-        this.draggedBody.position.x,
-        this.draggedBody.position.y
-      );
 
+      let distanceFromCenter = Math.hypot(
+        this.draggedBody.position.x - this.center.x, 
+        this.draggedBody.position.y - this.center.y
+      );
+      // console.log("distance from center: " + distanceFromCenter);
       if (distanceFromCenter > this.circle.radius) {
-        this.constraint.bodyB = this.draggedBody;
+        console.log("exceeding circle radius");
         this.constraint.stiffness = 1;
         this.constraint.length = this.circle.radius;
       } else {
-        this.constraint.stiffness = 1e-10;
+        // this.constraint.stiffness = 1e-10;
       }
     });
 
