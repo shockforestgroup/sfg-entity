@@ -245,10 +245,10 @@ class EntityOrganisms {
       // console.log("distance from center: " + distanceFromCenter);
       if (distanceFromCenter > this.circle.radius) {
         console.log("exceeding circle radius");
-        this.constraint.stiffness = 1;
+        this.constraint.stiffness = 5;
         this.constraint.length = this.circle.radius;
       } else {
-        // this.constraint.stiffness = 1e-10;
+        this.constraint.stiffness = 1e-10;
       }
     });
 
