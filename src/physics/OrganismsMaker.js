@@ -182,7 +182,6 @@ class EntityOrganisms {
     }
 
     this.constraint = Matter.Constraint.create({
-      length: this.circle.radius,
       stiffness: 1e-10,
       pointA: this.center,
       //initialize with a random body, doesnt matter for now as long as stiffness isnt tangible
@@ -199,7 +198,11 @@ class EntityOrganisms {
     //Mouse.setOffset(mouse, this.offset);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse: mouse,
-      constraint: { stiffness: 0.8, render: { visible: false } },
+      constraint: { 
+        // allow bodies on mouse to rotate
+        angularStiffness: 0,
+        render: { visible: false } 
+      },
     });
 
     World.add(world, mouseConstraint);
@@ -242,11 +245,12 @@ class EntityOrganisms {
         this.draggedBody.position.x - this.center.x, 
         this.draggedBody.position.y - this.center.y
       );
-      // console.log("distance from center: " + distanceFromCenter);
-      if (distanceFromCenter > this.circle.radius) {
-        console.log("exceeding circle radius");
-        this.constraint.stiffness = 5;
-        this.constraint.length = this.circle.radius;
+      //make max distance slightly smaller than circle radius 
+      //to compensate from constraints not being perfectly stiff and make sure organism stays within circle bounds.
+      let maxDistanceFromCenter = this.circle.radius + this.circle.radius * -0.06;
+      if (distanceFromCenter > maxDistanceFromCenter) {
+        this.constraint.stiffness = 2;
+        this.constraint.length = maxDistanceFromCenter;
       } else {
         this.constraint.stiffness = 1e-10;
       }
