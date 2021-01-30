@@ -182,11 +182,11 @@ class EntityOrganisms {
     this.constraint = Matter.Constraint.create({
       length: this.circle.radius,
       stiffness: 1e-10,
-      pointA: { x: 0, y: 0 },
+      pointA: center,
       //initialize with a random body, doesnt matter for now as long as stiffness isnt tangible
       bodyB: bodies[0],
       render: {
-        visible: false,
+        visible: true,
       }
     });
 
@@ -232,7 +232,7 @@ class EntityOrganisms {
 
     /*************** Behavior of organisms when they come close to the border ********************/
 
-    /* Events.on(engine, "beforeUpdate", (event) => {
+    Events.on(engine, "beforeUpdate", (event) => {
       if (!this.draggedBody) return;
       const distanceFromCenter = Math.hypot(
         this.draggedBody.position.x,
@@ -246,7 +246,7 @@ class EntityOrganisms {
       } else {
         this.constraint.stiffness = 1e-10;
       }
-    });*/
+    });
 
     this.engine = engine;
     this.mouse = mouse;
