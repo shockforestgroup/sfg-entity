@@ -9210,6 +9210,11 @@ schema-utils@^2.6.6:
     ajv "^6.12.2"
     ajv-keywords "^3.4.1"
 
+screen-orientation-js@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/screen-orientation-js/-/screen-orientation-js-1.0.2.tgz#5120879b0cc964ae5fccf8f2be6b65c550c364af"
+  integrity sha512-F9YXfGmA60UG1qLSYrZvgFPTUddjcr3m9Fpp/yi26/D3UghmJsujZsfBDMwBpzc2i5hg3i19gi4KCrXasZbq5g==
+
 select-hose@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/select-hose/-/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
