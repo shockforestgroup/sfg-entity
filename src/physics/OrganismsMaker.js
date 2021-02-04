@@ -52,6 +52,7 @@ class EntityOrganisms {
     this.canvasWidth = window.innerWidth;
     this.canvasHeight = window.innerHeight;
     this.circle = options.circle;
+    this.center = { x: this.canvasWidth / 2, y: this.canvasHeight / 2 };
     this.offset = options.offset || { x: 0, y: 0 };
     this.organisms = [];
     this.engine = null;
@@ -74,6 +75,8 @@ class EntityOrganisms {
     this.element.height = this.canvasHeight;
     this.attractiveBody.position.x = this.canvasWidth / 2;
     this.attractiveBody.position.y = this.canvasHeight / 2;
+    this.center = { x: this.canvasWidth / 2, y: this.canvasHeight / 2 };
+    this.constraint.pointA = this.center;
   }
 
   spawnNewOrganism() {
@@ -172,17 +175,15 @@ class EntityOrganisms {
 
     // add some bodies that to be attracted
     let bodies = [];
-    const center = { x: this.canvasWidth / 2, y: this.canvasHeight / 2 };
     for (let i = 0; i < SETTINGS.amountOrganisms; i += 1) {
-      const body = createBody(center, this.circle.radius);
+      const body = createBody(this.center, this.circle.radius);
       World.add(world, body);
       bodies.push(body);
     }
 
     this.constraint = Matter.Constraint.create({
-      length: this.circle.radius,
       stiffness: 1e-10,
-      pointA: { x: 0, y: 0 },
+      pointA: this.center,
       //initialize with a random body, doesnt matter for now as long as stiffness isnt tangible
       bodyB: bodies[0],
       render: {
@@ -197,7 +198,11 @@ class EntityOrganisms {
     //Mouse.setOffset(mouse, this.offset);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse: mouse,
-      constraint: { stiffness: 0.8, render: { visible: false } },
+      constraint: { 
+        // allow bodies on mouse to rotate
+        angularStiffness: 0,
+        render: { visible: false } 
+      },
     });
 
     World.add(world, mouseConstraint);
@@ -205,6 +210,7 @@ class EntityOrganisms {
     /*************** Mouse Events....!!! ********************/
     Events.on(mouseConstraint, "startdrag", (event) => {
       this.draggedBody = event.body;
+      this.constraint.bodyB = this.draggedBody;
       if (this.isTouch) {
         Body.scale(this.draggedBody, 2, 2);
       }
@@ -232,21 +238,23 @@ class EntityOrganisms {
 
     /*************** Behavior of organisms when they come close to the border ********************/
 
-    /* Events.on(engine, "beforeUpdate", (event) => {
+    Events.on(engine, "beforeUpdate", (event) => {
       if (!this.draggedBody) return;
-      const distanceFromCenter = Math.hypot(
-        this.draggedBody.position.x,
-        this.draggedBody.position.y
-      );
 
-      if (distanceFromCenter > this.circle.radius) {
-        this.constraint.bodyB = this.draggedBody;
-        this.constraint.stiffness = 1;
-        this.constraint.length = this.circle.radius;
+      let distanceFromCenter = Math.hypot(
+        this.draggedBody.position.x - this.center.x, 
+        this.draggedBody.position.y - this.center.y
+      );
+      //make max distance slightly smaller than circle radius 
+      //to compensate from constraints not being perfectly stiff and make sure organism stays within circle bounds.
+      let maxDistanceFromCenter = this.circle.radius + this.circle.radius * -0.06;
+      if (distanceFromCenter > maxDistanceFromCenter) {
+        this.constraint.stiffness = 2;
+        this.constraint.length = maxDistanceFromCenter;
       } else {
         this.constraint.stiffness = 1e-10;
       }
-    });*/
+    });
 
     this.engine = engine;
     this.mouse = mouse;

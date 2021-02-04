@@ -95,6 +95,7 @@ class Entity extends React.Component {
       onDragEnd: this.handleDragEnd,
       onDragMove: this.handleDragMove,
       isTouch: isTouchDevice(),
+      scaleFactor: this.state.scaleFactor,
     });
   }
 
@@ -146,6 +147,8 @@ class Entity extends React.Component {
   handleResize() {
     const newCircle = generateCircle();
     const scaleFactor = newCircle.radius / this.originalCircle.radius;
+    //TODO: check if its ok to change  entityorganismmaker property from here, or if its against functional programming standards.
+    this.entityOrganismsMaker.circle = newCircle;
     this.setState({
       screenWidth: window.innerWidth,
       bigCircle: newCircle,
