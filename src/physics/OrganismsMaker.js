@@ -187,7 +187,7 @@ class EntityOrganisms {
       //initialize with a random body, doesnt matter for now as long as stiffness isnt tangible
       bodyB: bodies[0],
       render: {
-        visible: true,
+        visible: false,
       }
     });
 
