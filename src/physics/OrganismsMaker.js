@@ -105,28 +105,7 @@ class EntityOrganisms {
     return this.organisms;
   }
 
-  updateHalo() {
-    if (!this.draggedBody) return;
-    const ctx = this.renderer.context;
-    const posX = this.draggedBody.position.x;
-    const posY = this.draggedBody.position.y;
-    const grad = ctx.createRadialGradient(posX, posY, 0, posX, posY, 20);
-    grad.addColorStop(0, "rgba(0,0,0,0.0");
-    grad.addColorStop(0.9, "rgba(255,255,255,100");
-    grad.addColorStop(1, "rgba(255,255,255,0");
-
-    ctx.beginPath();
-    ctx.arc(
-      this.draggedBody.position.x,
-      this.draggedBody.position.y,
-      20,
-      0,
-      2 * Math.PI
-    );
-    ctx.stroke();
-    ctx.strokeStyle = "#FF0000";
-    this.draggedBody.render.fillStyle = grad;
-  }
+  updateHalo() {}
 
   _initPhysics() {
     console.log("this.element", this.element);
@@ -141,7 +120,7 @@ class EntityOrganisms {
         height: this.canvasHeight,
         //wireframeBackground: "transparent",
         wireframes: false,
-        showShadows: true,
+        showHalos: true,
       },
     });
     this.renderer = renderer;

@@ -77,6 +77,7 @@ var Mouse = require("matter-js/src/core/Mouse");
         showAngleIndicator: false,
         showIds: false,
         showShadows: false,
+        showHalos: false,
         showVertexNumbers: false,
         showConvexHulls: false,
         showInternalEdges: false,
@@ -397,6 +398,7 @@ var Mouse = require("matter-js/src/core/Mouse");
     }
 
     if (options.showShadows) Render.bodyShadows(render, bodies, context);
+    if (options.showHalos) Render.bodyHalos(render, bodies, context);
 
     if (options.showBounds) Render.bodyBounds(render, bodies, context);
 
@@ -580,6 +582,60 @@ var Mouse = require("matter-js/src/core/Mouse");
         c.closePath();
         c.fill();
       }
+    }
+  };
+
+  /**
+   * Description
+   * @private
+   * @method bodyHalos
+   * @param {render} render
+   * @param {body[]} bodies
+   * @param {RenderingContext} context
+   */
+  Render.bodyHalos = function (render, bodies, context) {
+    var c = context,
+      engine = render.engine;
+
+    for (var i = 0; i < bodies.length; i++) {
+      var body = bodies[i];
+
+      if (!body.render.visible) continue;
+
+      if (body.circleRadius) {
+        c.beginPath();
+        c.arc(
+          body.position.x,
+          body.position.y,
+          body.circleRadius,
+          0,
+          2 * Math.PI
+        );
+        c.closePath();
+      } else {
+        c.beginPath();
+        c.moveTo(body.vertices[0].x, body.vertices[0].y);
+        for (var j = 1; j < body.vertices.length; j++) {
+          c.lineTo(body.vertices[j].x, body.vertices[j].y);
+        }
+        c.closePath();
+      }
+
+      var distanceX = body.position.x - render.options.width * 0.5,
+        distanceY = body.position.y - render.options.height * 0.2,
+        distance = Math.abs(distanceX) + Math.abs(distanceY);
+
+      c.shadowColor = "rgba(255,255,255,1)";
+      c.shadowOffsetX = 0.0 * distanceX;
+      c.shadowOffsetY = 0.0 * distanceY;
+      c.shadowBlur = 40; //1 + 12 * Math.min(1, distance / 100);
+
+      c.fill();
+
+      c.shadowColor = null;
+      c.shadowOffsetX = null;
+      c.shadowOffsetY = null;
+      c.shadowBlur = null;
     }
   };
 
