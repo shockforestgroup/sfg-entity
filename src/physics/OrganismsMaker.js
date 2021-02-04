@@ -195,22 +195,20 @@ class EntityOrganisms {
     /*************** Mouse Events....!!! ********************/
     Events.on(mouseConstraint, "startdrag", (event) => {
       this.draggedBody = event.body;
-      this.draggedBody.hasHalo = true;
       this.constraint.bodyB = this.draggedBody;
       if (this.isTouch) {
-        //Body.scale(this.draggedBody, 2, 2);
+        this.draggedBody.hasHalo = true;
       }
       this.onDragStart(event);
     });
 
     Events.on(mouseConstraint, "enddrag", (event) => {
       if (this.isTouch) {
-        //Body.scale(this.draggedBody, 0.5, 0.5);
-        //this.resetGradient();
+        this.draggedBody.hasHalo = false;
       }
 
       this.onDragEnd(event, this.draggedBody);
-      this.draggedBody.hasHalo = false;
+
       this.draggedBody = null;
       this.constraint.stiffness = 1e-10;
     });
