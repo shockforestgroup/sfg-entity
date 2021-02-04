@@ -105,8 +105,6 @@ class EntityOrganisms {
     return this.organisms;
   }
 
-  updateHalo() {}
-
   _initPhysics() {
     console.log("this.element", this.element);
     const engine = Engine.create();
