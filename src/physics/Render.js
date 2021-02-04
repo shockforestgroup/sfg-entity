@@ -396,6 +396,8 @@ var Mouse = require("matter-js/src/core/Mouse");
       Render.bodyWireframes(render, bodies, context);
     }
 
+    if (options.showShadows) Render.bodyShadows(render, bodies, context);
+
     if (options.showBounds) Render.bodyBounds(render, bodies, context);
 
     if (options.showAxes || options.showAngleIndicator)

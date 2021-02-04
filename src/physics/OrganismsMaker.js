@@ -141,7 +141,7 @@ class EntityOrganisms {
         height: this.canvasHeight,
         //wireframeBackground: "transparent",
         wireframes: false,
-        showShadows: false,
+        showShadows: true,
       },
     });
     this.renderer = renderer;
