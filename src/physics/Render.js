@@ -596,9 +596,9 @@ var Mouse = require("matter-js/src/core/Mouse");
   Render.bodyHalos = function (render, bodies, context) {
     var c = context,
       engine = render.engine;
-
-    for (var i = 0; i < bodies.length; i++) {
-      var body = bodies[i];
+    const bodiesWithHalo = bodies.filter((b) => b.hasHalo);
+    for (var i = 0; i < bodiesWithHalo.length; i++) {
+      var body = bodiesWithHalo[i];
 
       if (!body.render.visible) continue;
 
