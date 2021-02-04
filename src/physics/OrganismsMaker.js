@@ -7,9 +7,9 @@ import Matter, {
   Mouse,
   MouseConstraint,
   Runner,
-  Render,
   World,
 } from "matter-js";
+import Render from "./Render";
 import MatterAttractors from "matter-attractors";
 import getRandomInRange from "../helpers/getRandomInRange";
 
@@ -35,9 +35,14 @@ function createBody(center, radius, pos) {
 
   return Bodies.rectangle(position.x, position.y, size, size, {
     chamfer: {
-      radius: [Math.round(size * 0.75), Math.round(size * 0.3), Math.round(size * 0.75), Math.round(size * 0.3)],
+      radius: [
+        Math.round(size * 0.75),
+        Math.round(size * 0.3),
+        Math.round(size * 0.75),
+        Math.round(size * 0.3),
+      ],
       //keep this at 3 (for organism sizes smaller than 30), since other values cause issues with performance and selfintersection. Auto quality setting also has these issues.
-      quality: 3, 
+      quality: 3,
     },
     render: { fillStyle: "black", strokeStyle: "white", lineWidth: "2" },
     angle: Common.random(0, 6),
@@ -100,27 +105,27 @@ class EntityOrganisms {
     return this.organisms;
   }
 
-  updateGradient() {
+  updateHalo() {
     if (!this.draggedBody) return;
+    const ctx = this.renderer.context;
     const posX = this.draggedBody.position.x;
     const posY = this.draggedBody.position.y;
-    const grad = this.renderer.context.createRadialGradient(
-      posX,
-      posY,
-      0,
-      posX,
-      posY,
-      20
-    );
+    const grad = ctx.createRadialGradient(posX, posY, 0, posX, posY, 20);
     grad.addColorStop(0, "rgba(0,0,0,0.0");
     grad.addColorStop(0.9, "rgba(255,255,255,100");
     grad.addColorStop(1, "rgba(255,255,255,0");
-    this.draggedBody.render.fillStyle = grad;
-  }
 
-  resetGradient() {
-    if (!this.draggedBody) return;
-    this.draggedBody.render.fillStyle = "black";
+    ctx.beginPath();
+    ctx.arc(
+      this.draggedBody.position.x,
+      this.draggedBody.position.y,
+      20,
+      0,
+      2 * Math.PI
+    );
+    ctx.stroke();
+    ctx.strokeStyle = "#FF0000";
+    this.draggedBody.render.fillStyle = grad;
   }
 
   _initPhysics() {
@@ -136,6 +141,7 @@ class EntityOrganisms {
         height: this.canvasHeight,
         //wireframeBackground: "transparent",
         wireframes: false,
+        showShadows: false,
       },
     });
     this.renderer = renderer;
@@ -188,7 +194,7 @@ class EntityOrganisms {
       bodyB: bodies[0],
       render: {
         visible: false,
-      }
+      },
     });
 
     World.add(world, this.constraint);
@@ -198,10 +204,10 @@ class EntityOrganisms {
     //Mouse.setOffset(mouse, this.offset);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse: mouse,
-      constraint: { 
+      constraint: {
         // allow bodies on mouse to rotate
         angularStiffness: 0,
-        render: { visible: false } 
+        render: { visible: false },
       },
     });
 
@@ -212,15 +218,15 @@ class EntityOrganisms {
       this.draggedBody = event.body;
       this.constraint.bodyB = this.draggedBody;
       if (this.isTouch) {
-        Body.scale(this.draggedBody, 2, 2);
+        //Body.scale(this.draggedBody, 2, 2);
       }
       this.onDragStart(event);
     });
 
     Events.on(mouseConstraint, "enddrag", (event) => {
       if (this.isTouch) {
-        Body.scale(this.draggedBody, 0.5, 0.5);
-        this.resetGradient();
+        //Body.scale(this.draggedBody, 0.5, 0.5);
+        //this.resetGradient();
       }
 
       this.onDragEnd(event, this.draggedBody);
@@ -231,7 +237,7 @@ class EntityOrganisms {
     Events.on(mouseConstraint, "mousemove", (event) => {
       /* if we're actually dragging */
       if (this.draggedBody) {
-        this.isTouch && this.updateGradient();
+        this.isTouch && this.updateHalo();
         this.onDragMove(event, this.draggedBody);
       }
     });
@@ -242,12 +248,13 @@ class EntityOrganisms {
       if (!this.draggedBody) return;
 
       let distanceFromCenter = Math.hypot(
-        this.draggedBody.position.x - this.center.x, 
+        this.draggedBody.position.x - this.center.x,
         this.draggedBody.position.y - this.center.y
       );
-      //make max distance slightly smaller than circle radius 
+      //make max distance slightly smaller than circle radius
       //to compensate from constraints not being perfectly stiff and make sure organism stays within circle bounds.
-      let maxDistanceFromCenter = this.circle.radius + this.circle.radius * -0.06;
+      let maxDistanceFromCenter =
+        this.circle.radius + this.circle.radius * -0.06;
       if (distanceFromCenter > maxDistanceFromCenter) {
         this.constraint.stiffness = 2;
         this.constraint.length = maxDistanceFromCenter;
