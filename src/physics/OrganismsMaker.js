@@ -214,7 +214,6 @@ class EntityOrganisms {
     Events.on(mouseConstraint, "mousemove", (event) => {
       /* if we're actually dragging */
       if (this.draggedBody) {
-        this.isTouch && this.updateHalo();
         this.onDragMove(event, this.draggedBody);
       }
     });
