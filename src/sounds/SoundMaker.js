@@ -8,18 +8,19 @@ import soundPointer from "./pointer.flac";
 import {Howl, Howler} from 'howler'; 
 
 const answerSounds = [soundAnswer1, soundAnswer2, soundAnswer3, soundAnswer4];
+const volumePointer = 0.15;
+const fadeDuration = 300;
 
 class SoundMaker {
   constructor() {
     this.pointerSoundAudio = new Howl({
       src: soundPointer,
       loop: true,
-      volume: 0.15
+      volume: volumePointer
     })
     this.backgroundSound = new Howl({
       src: soundBackground,
       loop: true,
-      autoplay: true
     })
     // this.answerSounds = answerSounds.map((sound) => new Audio(sound));
   }
@@ -29,12 +30,15 @@ class SoundMaker {
   }
   playPointerSound() {
     this.pointerSoundAudio.play();
+    this.pointerSoundAudio.fade(0, volumePointer, fadeDuration);
   }
   stopPointerSound() {
-    this.pointerSoundAudio.pause();
+    this.pointerSoundAudio.once( 'fade', () => { this.pointerSoundAudio.stop(); });
+    this.pointerSoundAudio.fade(volumePointer, 0, fadeDuration);
   }
   playBackgroundSound() {
     this.backgroundSound.play();
+    this.backgroundSound.fade(0, 1, fadeDuration);
   }
 }
 

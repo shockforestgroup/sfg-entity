@@ -7,7 +7,6 @@ import EntityQuestion from "./EntityQuestion";
 import EntityAnswers from "./EntityAnswers";
 import EntityStartPrompt from "./EntityStartPrompt";
 import SoundMaker from "../sounds/SoundMaker";
-import AudioPlayer from "./AudioPlayer"
 import OrganismMaker from "../physics/OrganismsMaker";
 
 import { isDebugMode } from "../helpers/readEnvVar.js";
@@ -260,7 +259,6 @@ class Entity extends React.Component {
 
   handleDragStart = (e) => {
     SoundMaker.playPointerSound();
-    // AudioPlayer.PlayAudio();
     const id = e.body.id;
     const point = {
       x: e.body.position.x,
@@ -283,7 +281,6 @@ class Entity extends React.Component {
 
   handleDragEnd = (e, body) => {
     SoundMaker.stopPointerSound();
-    // AudioPlayer.StopAudio();
     const id = e.body.id;
     const point = {
       x: e.body.position.x,

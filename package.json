@@ -13,7 +13,6 @@
     "matter-js": "^0.14.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-howler": "^5.0.0",
     "react-konva": "^16.13.0-6",
     "react-redux": "^7.2.1",
     "react-scripts": "3.4.3",
