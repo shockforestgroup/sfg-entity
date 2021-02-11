@@ -66,6 +66,7 @@ class Entity extends React.Component {
       traceLines: {},
       cursorType: "default",
       answersUncovered: false,
+      answerHovered: null,
       draggedOrganismId: null,
     };
   }
@@ -147,7 +148,6 @@ class Entity extends React.Component {
   handleResize() {
     const newCircle = generateCircle();
     const scaleFactor = newCircle.radius / this.originalCircle.radius;
-    //TODO: check if its ok to change  entityorganismmaker property from here, or if its against functional programming standards.
     this.entityOrganismsMaker.circle = newCircle;
     this.setState({
       screenWidth: window.innerWidth,
@@ -190,25 +190,39 @@ class Entity extends React.Component {
     });
   };
 
-  /*handleDragHover = (e) => {
-    const organismId = e.target.id();
+  handleDragHover = (body) => {
+    const organismId = body.id;
+
+    const {min, max} = body.bounds;
+    const width = max.x - min.x;
+    const height = max.y - min.y;
+    const organismRect = {
+      x: body.position.x,
+      y: body.position.y,
+      width: width,
+      height: height,
+    }
+    // console.log("organism coordinates: " + "x: " + organismRect.x + "y: " + organismRect.y);
     let hoveredAnswerId = null;
+
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
       if (!ref) return;
-      if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
+      if (haveIntersection(organismRect, ref.getClientRect())) {
+        console.log("intersection on hover");
         hoveredAnswerId = id;
         break;
       }
     }
     this.setState({
-      replyState: {
-        confirmed: false,
-        answerId: hoveredAnswerId,
-        organismId: organismId,
-      },
+      // replyState: {
+      //   confirmed: false,
+      //   answerId: hoveredAnswerId,
+      //   organismId: organismId,
+      // },
+      answerHovered: hoveredAnswerId,
     });
-  };*/
+  };
 
   handleDropLandingStart = (e) => {
     if (!this.startTriggerRef) {
@@ -275,7 +289,7 @@ class Entity extends React.Component {
       x: body.position.x,
       y: body.position.y,
     };
-    //this.handleDragHover(e);
+    this.handleDragHover(body);
     this.updateDragLine(id, point);
   };
 
@@ -377,8 +391,8 @@ class Entity extends React.Component {
                 <EntityAnswers
                   options={this.props.answers}
                   radius={this.state.bigCircle.radius}
-                  currentActivated={this.state.answerActivated}
-                  currentTriggered={this.state.answerTriggered}
+                  currentHovered={this.state.answerHovered}
+                  // currentTriggered={this.state.answerTriggered}
                   createRef={(answerId, ref) => {
                     this.answerRefs[answerId] = ref;
                   }}

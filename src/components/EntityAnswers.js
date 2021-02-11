@@ -18,20 +18,23 @@ const index = ({
   options,
   radius,
   createRef,
-  currentActivated,
-  currentTriggered,
+  currentHovered,
+  // currentTriggered,
 }) => (
   <>
     {options.map(({ id, text }, i) => {
-      /* const isActivated = id === currentActivated;
-      const isTriggered = id === currentTriggered;*/
+      let fontSize = 12;
+      if(id == currentHovered){
+        fontSize = 24;
+      }
+
       const radians = calculateRadians(radius);
       const offsetForCentering = -180 + radians / 2;
       return (
         <AnnualRings
           key={id}
           ref={(ref) => createRef(id, ref)}
-          fontSize={14}
+          fontSize={fontSize}
           inverted={true}
           textLines={splitTextIntoLines(text)}
           x={0}
