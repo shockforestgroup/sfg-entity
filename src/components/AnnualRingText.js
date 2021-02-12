@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { TextPath } from "react-konva";
+import { TextPath, Group } from "react-konva";
 
 export default class AnnualRingText extends Component {
   constructor(props) {
@@ -22,6 +22,14 @@ export default class AnnualRingText extends Component {
     });
   }
 
+  changeScale() {
+    this.textPath.to({
+      scaleX: this.props.scale,
+      scaleY: this.props.scale,
+      duration: 0.1
+    })
+  }
+
   componentDidMount() {
     if (this.props.hasTypeEffect) {
       this.intervalID = setInterval(() => {
@@ -35,28 +43,41 @@ export default class AnnualRingText extends Component {
     this.intervalID = null;
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.scale != this.props.scale) {
+      this.changeScale();
+    }
+  }
+
   render() {
-    const { textColor, inverted, rotation, data, fontSize } = this.props;
+    const { textColor, inverted, rotation, data, fontSize, scale, offset } = this.props;
     const { text } = this.state;
     return (
-      <TextPath
-        text={text}
-        fill={textColor}
-        fontSize={fontSize}
-        fontFamily="Inconsolata"
-        align="center"
-        textBaseline={inverted ? "bottom" : "top"}
+      <Group
         rotation={rotation}
-        data={data}
-        x={0}
-        y={0}
-      />
+        offsetX={-offset.x}
+        offsetY={-offset.y}
+        >
+        <TextPath
+          ref={node => {
+            this.textPath = node;
+          }}
+          text={text}
+          fill={textColor}
+          fontSize={fontSize}
+          fontFamily="Inconsolata"
+          align="center"
+          textBaseline={inverted ? "bottom" : "top"}
+          data={data}
+          offset={offset}
+        />
+      </Group>
     );
   }
 }
 
 AnnualRingText.defaultProps = {
-  animationHasEnded: () => {},
+  animationHasEnded: () => { },
   typeEffectSpeed: 100,
   fontSize: 16,
 };

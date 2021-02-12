@@ -14,6 +14,15 @@ function calculateRadians(radius) {
   return (Math.asin(length) / 2) * 180;
 }
 
+function generateOffsetPoint(originX, originY, radius, angle) {
+  const x = originX + radius * Math.cos(angle);
+  const y = originY + radius + Math.sin(angle);
+  return {
+    x: x,
+    y: y
+  };
+}
+
 const index = ({
   options,
   radius,
@@ -23,9 +32,9 @@ const index = ({
 }) => (
   <>
     {options.map(({ id, text }, i) => {
-      let fontSize = 12;
+      let scale = 1;
       if(id == currentHovered){
-        fontSize = 24;
+        scale = 2;
       }
 
       const radians = calculateRadians(radius);
@@ -34,7 +43,8 @@ const index = ({
         <AnnualRings
           key={id}
           ref={(ref) => createRef(id, ref)}
-          fontSize={fontSize}
+          fontSize={9}
+          scale={scale}
           inverted={true}
           textLines={splitTextIntoLines(text)}
           x={0}
@@ -45,6 +55,10 @@ const index = ({
             offsetForCentering - (i / (options.length - 1)) * radians
           }
           opacity={0}
+          offset={{
+            x: 0,
+            y: radius
+          }}
         />
       );
     })}
