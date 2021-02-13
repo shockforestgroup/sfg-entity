@@ -193,7 +193,7 @@ class Entity extends React.Component {
   handleDragHover = (body) => {
     const organismId = body.id;
 
-    const {min, max} = body.bounds;
+    const { min, max } = body.bounds;
     const width = max.x - min.x;
     const height = max.y - min.y;
     const organismRect = {
@@ -387,18 +387,6 @@ class Entity extends React.Component {
                   </Group>
                 )}
 
-              {this.props.gameState === "playing" && this.state.fontsLoaded && (
-                <EntityAnswers
-                  options={this.props.answers}
-                  radius={this.state.bigCircle.radius}
-                  currentHovered={this.state.answerHovered}
-                  // currentTriggered={this.state.answerTriggered}
-                  createRef={(answerId, ref) => {
-                    this.answerRefs[answerId] = ref;
-                  }}
-                />
-              )}
-
               {Object.keys(this.state.traceLines).map((key) => (
                 <Line
                   scale={{
@@ -416,6 +404,18 @@ class Entity extends React.Component {
                   opacity={1}
                 />
               ))}
+
+              {this.props.gameState === "playing" && this.state.fontsLoaded && (
+                <EntityAnswers
+                  options={this.props.answers}
+                  radius={this.state.bigCircle.radius}
+                  currentHovered={this.state.answerHovered}
+                  // currentTriggered={this.state.answerTriggered}
+                  createRef={(answerId, ref) => {
+                    this.answerRefs[answerId] = ref;
+                  }}
+                />
+              )}
 
               {this.props.gameState === "afterendidle" && (
                 <Circle

@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { TextPath, Group } from "react-konva";
+import { TextPath, Group, Rect, Ellipse } from "react-konva";
+import settings from "../settings";
+import { isDebugMode } from "../helpers/readEnvVar.js";
 
 export default class AnnualRingText extends Component {
   constructor(props) {
@@ -57,7 +59,15 @@ export default class AnnualRingText extends Component {
         rotation={rotation}
         offsetX={-offset.x}
         offsetY={-offset.y}
-        >
+      >
+        <Ellipse
+          fill={isDebugMode ? settings.ENTITY_BG_COLOR_DEBUG : settings.ENTITY_BG_COLOR}
+          width={200}
+          height={80}
+          x={-15}
+          y={-45}
+          opacity={.5}
+        />
         <TextPath
           ref={node => {
             this.textPath = node;
