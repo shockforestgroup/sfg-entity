@@ -76,6 +76,7 @@ class Entity extends React.Component {
   questionRef = null;
   startTriggerRef = null;
   entityLayerRef = null;
+  traceLinesRefs = {};
   timer = null;
   originalCircle = null;
   animationFrameId = null;
@@ -329,6 +330,14 @@ class Entity extends React.Component {
         duration: 0.8,
       });
     }
+    for(let id in this.traceLinesRefs){
+      const ref = this.traceLinesRefs[id];
+      if(!ref) return;
+      ref.To({
+        opacity: 0.5,
+        duration: 0.8,
+      })
+    }
   }
 
   render() {
@@ -389,6 +398,9 @@ class Entity extends React.Component {
 
               {Object.keys(this.state.traceLines).map((key) => (
                 <Line
+                  ref={(key, node) => {
+                    this.traceLinesRefs[key] = node;
+                  }}
                   scale={{
                     x: this.state.scaleFactor,
                     y: this.state.scaleFactor,
@@ -401,9 +413,22 @@ class Entity extends React.Component {
                   shadowColor="#333"
                   shadowOffsetX={1}
                   shadowBlur={50}
-                  opacity={1}
+                  // opacity={0.5}
                 />
               ))}
+
+              {/* <Circle
+                x={0}
+                y={0}
+                radius={this.state.bigCircle.radius - 2}
+                // stroke={settings.ENTITY_STROKE_COLOR}
+                strokeWidth={settings.ENTITY_STROKE_WIDTH}
+                fill={
+                  isDebugMode
+                    ? settings.ENTITY_BG_COLOR_DEBUG
+                    : settings.ENTITY_BG_COLOR
+                }
+              /> */}
 
               {this.props.gameState === "playing" && this.state.fontsLoaded && (
                 <EntityAnswers
