@@ -208,10 +208,11 @@ class Entity extends React.Component {
 
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
-      if (!ref) return;
+      if (!ref) break;
       if (haveIntersection(organismRect, ref.getClientRect())) {
         console.log("intersection on hover");
         hoveredAnswerId = id;
+        debugger;
         break;
       }
     }
@@ -324,7 +325,7 @@ class Entity extends React.Component {
     this.setState({ answersUncovered: true });
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
-      if (!ref) return;
+      if (!ref) break;
       ref.to({
         opacity: 1,
         duration: 0.8,
@@ -332,11 +333,11 @@ class Entity extends React.Component {
     }
     for(let id in this.traceLinesRefs){
       const ref = this.traceLinesRefs[id];
-      if(!ref) return;
-      ref.To({
-        opacity: 0.5,
-        duration: 0.8,
-      })
+      if(!ref) break;
+      ref.to({
+        opacity: 0.3,
+        duration: 2.5,
+      });
     }
   }
 
@@ -398,7 +399,7 @@ class Entity extends React.Component {
 
               {Object.keys(this.state.traceLines).map((key) => (
                 <Line
-                  ref={(key, node) => {
+                  ref={node => {
                     this.traceLinesRefs[key] = node;
                   }}
                   scale={{
@@ -413,22 +414,8 @@ class Entity extends React.Component {
                   shadowColor="#333"
                   shadowOffsetX={1}
                   shadowBlur={50}
-                  // opacity={0.5}
                 />
               ))}
-
-              {/* <Circle
-                x={0}
-                y={0}
-                radius={this.state.bigCircle.radius - 2}
-                // stroke={settings.ENTITY_STROKE_COLOR}
-                strokeWidth={settings.ENTITY_STROKE_WIDTH}
-                fill={
-                  isDebugMode
-                    ? settings.ENTITY_BG_COLOR_DEBUG
-                    : settings.ENTITY_BG_COLOR
-                }
-              /> */}
 
               {this.props.gameState === "playing" && this.state.fontsLoaded && (
                 <EntityAnswers
