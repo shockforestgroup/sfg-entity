@@ -27,6 +27,7 @@ class AnnualRings extends Component {
     }
   }
 
+  
   render() {
     const {
       innerRef,
@@ -41,7 +42,9 @@ class AnnualRings extends Component {
       typeEffectSpeed,
       opacity,
       fontSize,
+      scale,
       textLines,
+      offset
     } = this.props;
 
     const { lineIndex } = this.state;
@@ -61,6 +64,7 @@ class AnnualRings extends Component {
                   isDebugMode ? settings.ENTITY_TEXT_COLOR_DEBUG : textColor
                 }
                 fontSize={fontSize}
+                scale={scale}
                 fill={textColor}
                 inverted={inverted}
                 rotation={rotationFn() + 180}
@@ -70,11 +74,14 @@ class AnnualRings extends Component {
                   y,
                   inverted: inverted,
                 })}
+                offset={offset}
                 hasTypeEffect={hasTypeEffect}
                 animationHasEnded={() => {
                   this.handleSingleLineAnimationHasEnded();
                 }}
-                typeEffectSpeed={typeEffectSpeed}
+                typeEffectSpeed={
+                  isDebugMode ? settings.ENTITY_TYPEEFFECTSPEED_DEBUG : typeEffectSpeed
+                }
               />
             )
         )}
@@ -91,9 +98,13 @@ AnnualRings.defaultProps = {
   ringWidth: 50,
   rotationFn: () => 0,
   hasTypeEffect: false,
-  typeEffectSpeed: 100,
+  typeEffectSpeed: settings.ENTITY_TYPEEFFECTSPEED,
   opacity: 1,
   onAllLinesAnimationHasEnded: () => {},
+  offset: {
+    x: 0,
+    y: 0
+  }
 };
 
 /* Note: The 'key' prop is crucial here to help reset state if props change */

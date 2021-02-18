@@ -66,6 +66,7 @@ class Entity extends React.Component {
       traceLines: {},
       cursorType: "default",
       answersUncovered: false,
+      answerHovered: null,
       draggedOrganismId: null,
     };
   }
@@ -75,6 +76,7 @@ class Entity extends React.Component {
   questionRef = null;
   startTriggerRef = null;
   entityLayerRef = null;
+  traceLinesRefs = {};
   timer = null;
   originalCircle = null;
   animationFrameId = null;
@@ -147,7 +149,6 @@ class Entity extends React.Component {
   handleResize() {
     const newCircle = generateCircle();
     const scaleFactor = newCircle.radius / this.originalCircle.radius;
-    //TODO: check if its ok to change  entityorganismmaker property from here, or if its against functional programming standards.
     this.entityOrganismsMaker.circle = newCircle;
     this.setState({
       screenWidth: window.innerWidth,
@@ -190,25 +191,40 @@ class Entity extends React.Component {
     });
   };
 
-  /*handleDragHover = (e) => {
-    const organismId = e.target.id();
+  handleDragHover = (body) => {
+    const organismId = body.id;
+
+    const { min, max } = body.bounds;
+    const width = max.x - min.x;
+    const height = max.y - min.y;
+    const organismRect = {
+      x: body.position.x,
+      y: body.position.y,
+      width: width,
+      height: height,
+    }
+    // console.log("organism coordinates: " + "x: " + organismRect.x + "y: " + organismRect.y);
     let hoveredAnswerId = null;
+
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
-      if (!ref) return;
-      if (haveIntersection(e.target.getClientRect(), ref.getClientRect())) {
+      if (!ref) break;
+      if (haveIntersection(organismRect, ref.getClientRect())) {
+        console.log("intersection on hover");
         hoveredAnswerId = id;
+        debugger;
         break;
       }
     }
     this.setState({
-      replyState: {
-        confirmed: false,
-        answerId: hoveredAnswerId,
-        organismId: organismId,
-      },
+      // replyState: {
+      //   confirmed: false,
+      //   answerId: hoveredAnswerId,
+      //   organismId: organismId,
+      // },
+      answerHovered: hoveredAnswerId,
     });
-  };*/
+  };
 
   handleDropLandingStart = (e) => {
     if (!this.startTriggerRef) {
@@ -275,7 +291,7 @@ class Entity extends React.Component {
       x: body.position.x,
       y: body.position.y,
     };
-    //this.handleDragHover(e);
+    this.handleDragHover(body);
     this.updateDragLine(id, point);
   };
 
@@ -309,10 +325,18 @@ class Entity extends React.Component {
     this.setState({ answersUncovered: true });
     for (let id in this.answerRefs) {
       const ref = this.answerRefs[id];
-      if (!ref) return;
+      if (!ref) break;
       ref.to({
         opacity: 1,
         duration: 0.8,
+      });
+    }
+    for(let id in this.traceLinesRefs){
+      const ref = this.traceLinesRefs[id];
+      if(!ref) break;
+      ref.to({
+        opacity: 0.3,
+        duration: 2.5,
       });
     }
   }
@@ -373,20 +397,11 @@ class Entity extends React.Component {
                   </Group>
                 )}
 
-              {this.props.gameState === "playing" && this.state.fontsLoaded && (
-                <EntityAnswers
-                  options={this.props.answers}
-                  radius={this.state.bigCircle.radius}
-                  currentActivated={this.state.answerActivated}
-                  currentTriggered={this.state.answerTriggered}
-                  createRef={(answerId, ref) => {
-                    this.answerRefs[answerId] = ref;
-                  }}
-                />
-              )}
-
               {Object.keys(this.state.traceLines).map((key) => (
                 <Line
+                  ref={node => {
+                    this.traceLinesRefs[key] = node;
+                  }}
                   scale={{
                     x: this.state.scaleFactor,
                     y: this.state.scaleFactor,
@@ -399,9 +414,20 @@ class Entity extends React.Component {
                   shadowColor="#333"
                   shadowOffsetX={1}
                   shadowBlur={50}
-                  opacity={1}
                 />
               ))}
+
+              {this.props.gameState === "playing" && this.state.fontsLoaded && (
+                <EntityAnswers
+                  options={this.props.answers}
+                  radius={this.state.bigCircle.radius}
+                  currentHovered={this.state.answerHovered}
+                  // currentTriggered={this.state.answerTriggered}
+                  createRef={(answerId, ref) => {
+                    this.answerRefs[answerId] = ref;
+                  }}
+                />
+              )}
 
               {this.props.gameState === "afterendidle" && (
                 <Circle
