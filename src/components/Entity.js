@@ -409,7 +409,7 @@ class Entity extends React.Component {
                   key={key}
                   id={key}
                   points={this.state.traceLines[key].points}
-                  stroke={this.state.traceLines[key].confirmed && "#aaa"}
+                  stroke={this.state.traceLines[key].confirmed && settings.DRAGLINE_STROKE_COLOR}
                   strokeWidth={1}
                   shadowColor="#333"
                   shadowOffsetX={1}

@@ -12,6 +12,7 @@ import Matter, {
 import Render from "./Render";
 import MatterAttractors from "matter-attractors";
 import getRandomInRange from "../helpers/getRandomInRange";
+import settings from "../settings";
 
 Matter.use(MatterAttractors);
 
@@ -44,7 +45,7 @@ function createBody(center, radius, pos) {
       //keep this at 3 (for organism sizes smaller than 30), since other values cause issues with performance and selfintersection. Auto quality setting also has these issues.
       quality: 3,
     },
-    render: { fillStyle: "black", strokeStyle: "white", lineWidth: "2" },
+    render: { fillStyle: settings.ENTITY_BG_COLOR, strokeStyle: settings.ORGANISM_STROKE_COLOR, lineWidth: "2" },
     angle: Common.random(0, 6),
     frictionAir: 0.5,
     density: 0.001,
