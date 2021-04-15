@@ -201,9 +201,7 @@ class EntityOrganisms {
     });
 
     Events.on(mouseConstraint, "enddrag", (event) => {
-      if (this.isTouch) {
-        this.draggedBody.hasHalo = false;
-      }
+      this.draggedBody.hasHalo = false;
 
       this.onDragEnd(event, this.draggedBody);
 
