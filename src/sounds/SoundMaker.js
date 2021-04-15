@@ -1,5 +1,5 @@
 //Using both webm and mp3 audioformats, since the combination of these gives highest browser support
-//with lowest filesize (See: https://github.com/goldfire/howler.js#format-recommendations). 
+//with lowest filesize (See: https://github.com/goldfire/howler.js#format-recommendations).
 //Also webm can do gapless looping.
 
 import soundAnswer1Webm from "./answer1.webm";
@@ -15,13 +15,13 @@ import soundPointerWebm from "./pointer.webm";
 import soundBackgroundMp3 from "./background.mp3";
 import soundPointerMp3 from "./pointer.mp3";
 
-import {Howl, Howler} from 'howler'; 
+import { Howl } from "howler";
 
 const answerSounds = [
-  [soundAnswer1Webm, soundAnswer1Mp3], 
-  [soundAnswer2Webm, soundAnswer2Mp3], 
-  [soundAnswer3Webm, soundAnswer3Mp3], 
-  [soundAnswer4Webm, soundAnswer4Mp3]
+  [soundAnswer1Webm, soundAnswer1Mp3],
+  [soundAnswer2Webm, soundAnswer2Mp3],
+  [soundAnswer3Webm, soundAnswer3Mp3],
+  [soundAnswer4Webm, soundAnswer4Mp3],
 ];
 const volumePointer = 0.15;
 const fadeDuration = 300;
@@ -31,15 +31,18 @@ class SoundMaker {
     this.pointerSoundAudio = new Howl({
       src: [soundPointerWebm, soundPointerMp3],
       loop: true,
-      volume: volumePointer
-    })
+      volume: volumePointer,
+    });
     this.backgroundSound = new Howl({
       src: [soundBackgroundWebm, soundBackgroundMp3],
       loop: true,
-    })
-    this.answerSounds = answerSounds.map((sound) => new Howl({
-      src: sound
-    }));
+    });
+    this.answerSounds = answerSounds.map(
+      (sound) =>
+        new Howl({
+          src: sound,
+        })
+    );
   }
   playAnswerSound(answerID) {
     const sound = this.answerSounds[answerID % this.answerSounds.length];
@@ -50,7 +53,9 @@ class SoundMaker {
     this.pointerSoundAudio.fade(0, volumePointer, fadeDuration);
   }
   stopPointerSound() {
-    this.pointerSoundAudio.once( 'fade', () => { this.pointerSoundAudio.stop(); });
+    this.pointerSoundAudio.once("fade", () => {
+      this.pointerSoundAudio.stop();
+    });
     this.pointerSoundAudio.fade(volumePointer, 0, fadeDuration);
   }
   playBackgroundSound() {
