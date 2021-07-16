@@ -596,39 +596,38 @@ var Mouse = require("matter-js/src/core/Mouse");
   Render.bodyHalos = function (render, bodies, context) {
     var c = context,
       engine = render.engine;
-    const bodiesWithHalo = bodies.filter((b) => b.hasHalo);
+    const bodiesWithHalo = bodies.filter((b) => b.hasHalo && b.render.visible);
     for (var i = 0; i < bodiesWithHalo.length; i++) {
       var body = bodiesWithHalo[i];
+      var haloOuterRadius = 100;
 
-      if (!body.render.visible) continue;
+      c.beginPath();
+      c.arc(body.position.x, body.position.y, haloOuterRadius, 0, 2 * Math.PI);
+      c.closePath();
 
-      if (body.circleRadius) {
-        c.beginPath();
-        c.arc(
-          body.position.x,
-          body.position.y,
-          body.circleRadius,
-          0,
-          2 * Math.PI
-        );
-        c.closePath();
-      } else {
-        c.beginPath();
-        c.moveTo(body.vertices[0].x, body.vertices[0].y);
-        for (var j = 1; j < body.vertices.length; j++) {
-          c.lineTo(body.vertices[j].x, body.vertices[j].y);
-        }
-        c.closePath();
+      var gradient = c.createRadialGradient(
+        body.position.x,
+        body.position.y,
+        1,
+        body.position.x,
+        body.position.y,
+        haloOuterRadius
+      );
+      gradient.addColorStop(0, "rgba(255,255,255,0.1)");
+      gradient.addColorStop(0.2, "rgba(255,255,255,0.4)");
+      gradient.addColorStop(1, "transparent");
+
+      c.fillStyle = gradient;
+      c.fill();
+
+      c.beginPath();
+      c.moveTo(body.vertices[0].x, body.vertices[0].y);
+      for (var j = 1; j < body.vertices.length; j++) {
+        c.lineTo(body.vertices[j].x, body.vertices[j].y);
       }
-
-      var distanceX = body.position.x - render.options.width * 0.5,
-        distanceY = body.position.y - render.options.height * 0.2,
-        distance = Math.abs(distanceX) + Math.abs(distanceY);
-
+      c.closePath();
       c.shadowColor = "rgba(255,255,255,1)";
-      c.shadowOffsetX = 0.0 * distanceX;
-      c.shadowOffsetY = 0.0 * distanceY;
-      c.shadowBlur = 40; //1 + 12 * Math.min(1, distance / 100);
+      c.shadowBlur = 20; //1 + 12 * Math.min(1, distance / 100);
 
       c.fill();
 

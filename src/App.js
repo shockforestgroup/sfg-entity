@@ -4,9 +4,9 @@ import { createStore } from "redux";
 import * as screenOrientation from "screen-orientation-js";
 import Entity from "./components/Entity";
 import GameController from "./components/GameController";
-
-import countReducer from "./redux/reducer.js";
-import { isDebugMode } from "./helpers/readEnvVar.js";
+import countReducer from "./redux/reducer";
+import { isDebugMode } from "./helpers/readEnvVar";
+import isMobileDevice from "./helpers/isMobileDevice";
 
 import settings from "./settings";
 
@@ -17,7 +17,9 @@ let store = createStore(
 
 class App extends React.Component {
   componentDidMount() {
-    screenOrientation.init({ color: "#fff", bgColor: "#000", fontSize: 3 });
+    if (isMobileDevice()) {
+      screenOrientation.init({ color: "#fff", bgColor: "#000", fontSize: 3 });
+    }
   }
   render() {
     return (
