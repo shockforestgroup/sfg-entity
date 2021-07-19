@@ -16,6 +16,7 @@ const countReducer = function (state = initialState, action) {
         ...state,
         hasEndedWhen: null,
         gameState: "startscreen",
+        step: 0,
       };
     case "PLAY":
       return {
