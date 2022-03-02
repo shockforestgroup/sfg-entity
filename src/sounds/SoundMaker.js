@@ -23,7 +23,11 @@ const answerSounds = [
   [soundAnswer3Webm, soundAnswer3Mp3],
   [soundAnswer4Webm, soundAnswer4Mp3],
 ];
+const volumeMaster = 0.55;
 const volumePointer = 0.15;
+const volumeBackground = 1;
+const volumeAnswer = 1;
+
 const fadeDuration = 300;
 
 class SoundMaker {
@@ -31,16 +35,18 @@ class SoundMaker {
     this.pointerSoundAudio = new Howl({
       src: [soundPointerWebm, soundPointerMp3],
       loop: true,
-      volume: volumePointer,
+      volume: volumePointer * volumeMaster,
     });
     this.backgroundSound = new Howl({
       src: [soundBackgroundWebm, soundBackgroundMp3],
       loop: true,
+      volume: volumeBackground * volumeMaster,
     });
     this.answerSounds = answerSounds.map(
       (sound) =>
         new Howl({
           src: sound,
+          volume: volumeAnswer * volumeMaster,
         })
     );
   }
@@ -50,17 +56,17 @@ class SoundMaker {
   }
   playPointerSound() {
     this.pointerSoundAudio.play();
-    this.pointerSoundAudio.fade(0, volumePointer, fadeDuration);
+    this.pointerSoundAudio.fade(0, volumePointer * volumeMaster, fadeDuration);
   }
   stopPointerSound() {
     this.pointerSoundAudio.once("fade", () => {
       this.pointerSoundAudio.stop();
     });
-    this.pointerSoundAudio.fade(volumePointer, 0, fadeDuration);
+    this.pointerSoundAudio.fade(volumePointer * volumeMaster, 0, fadeDuration);
   }
   playBackgroundSound() {
     this.backgroundSound.play();
-    this.backgroundSound.fade(0, 1, fadeDuration);
+    this.backgroundSound.fade(0, volumeBackground * volumeMaster, fadeDuration);
   }
 }
 
