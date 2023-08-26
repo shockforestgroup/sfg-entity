@@ -68,6 +68,7 @@ class Entity extends React.Component {
       answersUncovered: false,
       answerHovered: null,
       draggedOrganismId: null,
+      entityState: 0,
     };
   }
 
@@ -86,6 +87,21 @@ class Entity extends React.Component {
     this.checkFontLoading();
     this.initOrganismRendering();
     this.startAnimation();
+    this.setPropsFromUrl();
+  }
+
+  setPropsFromUrl() {
+    // Get the query string from the url prop
+    const queryString = this.props.url.split('?')[1];
+
+    // Create a URLSearchParams object
+    const params = new URLSearchParams(queryString);
+
+    // Get the values of data and color
+    const data = params.get('entityState');
+
+    // Update the state with the values
+    this.setState({ entityState });
   }
 
   initOrganismRendering() {
