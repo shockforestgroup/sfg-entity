@@ -2,13 +2,14 @@ import React from "react";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import * as screenOrientation from "screen-orientation-js";
-import Entity from "./components/Entity";
+import EntityWrapper from "./components/Entity";
 import GameController from "./components/GameController";
 import countReducer from "./redux/reducer";
 import { isDebugMode } from "./helpers/readEnvVar";
 import isMobileDevice from "./helpers/isMobileDevice";
 
 import settings from "./settings";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 let store = createStore(
   countReducer,
@@ -23,12 +24,20 @@ class App extends React.Component {
   }
   render() {
     return (
-      <Provider store={store}>
-        {isDebugMode && <GameController />}
-        <div style={{ backgroundColor: settings.CANVAS_BG_COLOR }}>
-          <Entity />
-        </div>
-      </Provider>
+      <Router>
+        <Provider store={store}>
+          {isDebugMode && <GameController />}
+          <div style={{ backgroundColor: settings.CANVAS_BG_COLOR }}>
+            <Routes>
+              <Route
+                path=":state"
+                element={<EntityWrapper />}
+              />
+            </Routes>
+            {/* <Entity /> */}
+          </div>
+        </Provider>
+      </Router>
     );
   }
 }

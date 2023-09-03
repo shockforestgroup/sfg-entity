@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import { useParams } from "react-router-dom";
 import { Stage, Layer, Circle, Line, Group } from "react-konva";
 import FontFaceObserver from "fontfaceobserver";
 import haveIntersection from "../helpers/haveIntersection";
@@ -51,6 +52,11 @@ function approximateRectAroundMouse(mouse) {
   };
 }
 
+function EntityWrapper(props) {
+  const { state } = useParams();
+  return <Entity {...props} entityState={state} />;
+}
+
 class Entity extends React.Component {
   constructor(props) {
     super(props);
@@ -68,7 +74,7 @@ class Entity extends React.Component {
       answersUncovered: false,
       answerHovered: null,
       draggedOrganismId: null,
-      entityState: 0,
+      entityState: props.entityState,
     };
   }
 
@@ -87,21 +93,6 @@ class Entity extends React.Component {
     this.checkFontLoading();
     this.initOrganismRendering();
     this.startAnimation();
-    this.setPropsFromUrl();
-  }
-
-  setPropsFromUrl() {
-    // Get the query string from the url prop
-    const queryString = this.props.url.split('?')[1];
-
-    // Create a URLSearchParams object
-    const params = new URLSearchParams(queryString);
-
-    // Get the values of data and color
-    const data = params.get('entityState');
-
-    // Update the state with the values
-    this.setState({ entityState });
   }
 
   initOrganismRendering() {
@@ -383,7 +374,7 @@ class Entity extends React.Component {
                 x={0}
                 y={0}
                 radius={this.state.bigCircle.radius - 2}
-                stroke={settings.ENTITY_STROKE_COLOR}
+                stroke={settings.ENTITY_STROKE_COLOR} //
                 strokeWidth={settings.ENTITY_STROKE_WIDTH}
                 fill={
                   isDebugMode
@@ -481,4 +472,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Entity);
+export default connect(mapStateToProps, mapDispatchToProps)(EntityWrapper);
