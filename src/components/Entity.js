@@ -374,7 +374,7 @@ class Entity extends React.Component {
                 x={0}
                 y={0}
                 radius={this.state.bigCircle.radius - 2}
-                stroke={settings.ENTITY_STROKE_COLOR} //
+                stroke={this.state.entityState == 0 ? settings.ENTITY_STROKE_COLOR : "red"} //
                 strokeWidth={settings.ENTITY_STROKE_WIDTH}
                 fill={
                   isDebugMode
